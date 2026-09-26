@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id           String    @id @default(cuid()) @map("user_id")
+  name         String    @map("user_name") @db.VarChar(50)
+  email        String    @unique @map("user_email") @db.VarChar(100)
+  password     String    @map("user_password") @db.VarChar(255)
+  isVerified   Boolean   @default(false) @map("is_verified")
+  role         UserRole  @default(USER) @map("role")
+  profileImage String?   @map("profile_image") @db.VarChar(255)
+  refreshToken String?   @unique() @map("refresh_token") @db.VarChar(255)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt
+  cars         Car[]
+  bookings     Booking[]
+
+  @@map("users")
+}
+
+enum CarCategory {
+  Sedan
+  SUV
+  Hatchback
+  Coupe
+  Convertible
+  Sports
+  Luxury
+  Supercar
+  MUV
+  MPV
+  Van
+  PickupTruck
+  Electric
+  Hybrid
+  OffRoad
+}
+
+enum FuelType {
+  Petrol
+  Diesel
+  Electric
+  Hybrid
+  CNG
+  LPG
+  Hydrogen
+}
+
+enum Transmission {
+  Manual
+  Automatic
+  SemiAutomatic
+  AMT
+  CVT
+  DCT
+}
+
+enum Location {
+  Albuquerque
+  Atlanta
+  Austin
+  Baltimore
+  Boston
+  Charlotte
+  Chicago
+  Cleveland
+  Colorado_Springs @map("Colorado Springs")
+  Columbus
+  Dallas
+  Denver
+  Detroit
+  El_Paso          @map("El Paso")
+  Fort_Worth       @map("Fort Worth")
+  Fresno
+  Houston
+  Indianapolis
+  Jacksonville
+  Kansas_City      @map("Kansas City")
+  Las_Vegas        @map("Las Vegas")
+  Long_Beach       @map("Long Beach")
+  Los_Angeles      @map("Los Angeles")
+  Memphis
+  Miami
+  Milwaukee
+  Minneapolis
+  Nashville
+  New_Orleans      @map("New Orleans")
+  New_York         @map("New York")
+  Oakland
+  Oklahoma_City    @map("Oklahoma City")
+  Omaha
+  Orlando
+  Philadelphia
+  Phoenix
+  Pittsburgh
+  Portland
+  Sacramento
+  San_Antonio      @map("San Antonio")
+  San_Diego        @map("San Diego")
+  San_Francisco    @map("San Francisco")
+  San_Jose         @map("San Jose")
+  Seattle
+  Tampa
+  Tucson
+  Tulsa
+  Virginia_Beach   @map("Virginia Beach")
+  Washington_DC    @map("Washington D.C.")
+  Wichita
+}
+
+model Car {
+  id               String       @id @default(cuid()) @map("car_id")
+  ownerId          String       @map("owner_id")
+  owner            User         @relation(fields: [ownerId], references: [id])
+  brand            String       @map("car_brand") @db.VarChar(50)
+  model            String       @map("car_model") @db.VarChar(50)
+  image            String?      @map("car_image") @db.VarChar(255)
+  year             Int          @map("car_year")
+  category         CarCategory  @map("car_category")
+  seating_capacity Int          @default(0) @map("seating_capacity")
+  fuelType         FuelType     @map("fuel_type")
+  transmission     Transmission @map("transmission")
+  pricePerDay      Float        @map("price_per_day")
+  location         Location     @map("location")
+  description      String?      @map("description") @db.Text
+  isAvailable      Boolean      @default(true) @map("is_available")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt
+  bookings         Booking[]
+
+  @@map("cars")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  CASH
+  UPI
+}
+
+model Booking {
+  id         String   @id @default(cuid()) @map("booking_id")
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  carId      String   @map("car_id")
+  car        Car      @relation(fields: [carId], references: [id])
+  pickupDate DateTime @map("start_date")
+  returnDate DateTime @map("end_date")
+  paymentBy  PaymentMethod @map("payment_by")
+  price      Float    @map("total_price")
+  status     String   @default("pending") @map("status") @db.VarChar(20)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+  @@map("bookings")
+}
