@@ -2,7 +2,8 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/client';
 import { CreateAuthDto } from '../dto/create-auth.dto.js';
-import { UserRole, UserStatus } from '../../../generated/prisma/enums.js';
+import { UserRole, UserStatus } from '../../generated/prisma/enums.js';
+
 
 
 

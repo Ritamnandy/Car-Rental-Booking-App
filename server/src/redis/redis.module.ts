@@ -3,6 +3,6 @@ import { RedisService } from './redis.service.js';
 
 @Module( {
   providers: [ RedisService ],
-  imports: [ RedisService ]
+  exports: [ RedisService ]
 } )
 export class RedisModule { }

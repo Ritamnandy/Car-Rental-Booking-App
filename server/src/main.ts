@@ -5,8 +5,9 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import helmet from 'helmet';
 
-async function bootstrap() {
-  const app = await NestFactory.create( AppModule);
+async function bootstrap ()
+{
+  const app = await NestFactory.create( AppModule );
   app.use( cookieParser() );
   app.use( compression() );
   app.use( helmet() );
@@ -16,6 +17,10 @@ async function bootstrap() {
   } );
   app.useGlobalPipes( new ValidationPipe() );
   app.enableShutdownHooks();
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen( process.env.PORT ?? 3000, () =>
+  {
+    console.log( 'Server started on port', process.env.PORT ?? 3000 );
+
+  } );
 }
 await bootstrap();

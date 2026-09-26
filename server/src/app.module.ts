@@ -4,18 +4,18 @@ import { AuthModule } from './auth/auth.module.js';
 import { RedisModule } from './redis/redis.module.js';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module.js';
-import {JwtModule} from '@nestjs/jwt'
+import { JwtModule } from '@nestjs/jwt'
 import { RedisService } from './redis/redis.service.js';
 import { BullModule } from '@nestjs/bullmq'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
-@Module({
+@Module( {
   imports: [
-    ConfigModule.forRoot({
+    ConfigModule.forRoot( {
       isGlobal: true,
     } ),
-    
-    JwtModule.register({
+
+    JwtModule.register( {
       global: true,
     } ),
     ThrottlerModule.forRoot( {
@@ -26,7 +26,7 @@ import { APP_GUARD } from '@nestjs/core';
         },
       ],
     } ),
-    
+
     PrismaModule,
     AuthModule,
     RedisModule,
@@ -35,7 +35,8 @@ import { APP_GUARD } from '@nestjs/core';
       imports: [ RedisModule ],
       useFactory: ( redis: RedisService ) => ( {
         connection: redis.getClient()
-      } )
+      } ),
+      inject: [ RedisService ],
     } ),
   ],
   controllers: [],
@@ -45,5 +46,5 @@ import { APP_GUARD } from '@nestjs/core';
       useClass: ThrottlerGuard,
     },
   ],
-})
-export class AppModule {}
+} )
+export class AppModule { }

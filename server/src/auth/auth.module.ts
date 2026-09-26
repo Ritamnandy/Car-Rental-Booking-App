@@ -5,10 +5,12 @@ import { AuthRepository } from './repository/auth.repository.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
 import { RedisModule } from '../redis/redis.module.js';
 import { MailModule } from '../mail/mail.module.js';
+import { AuthGuard } from './authguard/auth.guard.js';
 
 @Module( {
   imports: [ PrismaModule, RedisModule, MailModule ],
   controllers: [ AuthController ],
-  providers: [ AuthService, AuthRepository ],
+  providers: [ AuthService, AuthRepository, AuthGuard ],
+  exports: [ AuthGuard ]
 } )
 export class AuthModule { }
