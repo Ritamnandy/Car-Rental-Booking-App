@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import Mailgen from 'mailgen';
 import Nodemailer, { Transporter } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import
 {
     ChangedPasswordConfirmation,
@@ -15,7 +16,7 @@ import { Logger } from '@nestjs/common';
 @Processor( EMAIL_QUEUE )
 export class MailProcessor extends WorkerHost
 {
-    private readonly transporter: Transporter;
+    private readonly transporter: Transporter<SMTPTransport.SentMessageInfo>;
     private readonly mailgen: Mailgen;
     private readonly logger = new Logger( MailProcessor.name );
     constructor ()
@@ -37,7 +38,7 @@ export class MailProcessor extends WorkerHost
         } );
     }
 
-    async process ( job: Job )
+    async process ( job: Job ): Promise<SMTPTransport.SentMessageInfo>
     {
         this.logger.log(
             `Processing job "${ job.name }" (id: ${ job.id }) for ${ job.data ?? 'unknown' }`,
@@ -45,7 +46,7 @@ export class MailProcessor extends WorkerHost
 
         try
         {
-            let result;
+            let result: SMTPTransport.SentMessageInfo;
 
             switch ( job.name )
             {
@@ -83,12 +84,12 @@ export class MailProcessor extends WorkerHost
         to: string,
         subject: string,
         emailBody: Mailgen.Content,
-    )
+    ): Promise<SMTPTransport.SentMessageInfo>
     {
         const html = this.mailgen.generate( emailBody ) as string;
         const text = this.mailgen.generatePlaintext( emailBody ) as string;
         this.logger.log( 'Sending email', { to: to } );
-        return await this.transporter.sendMail( {
+        return this.transporter.sendMail( {
             from: process.env.APP_EMAIL,
             to,
             subject,
@@ -99,63 +100,54 @@ export class MailProcessor extends WorkerHost
 
     private async sendWelcomeEmail (
         job: Job,
-    )
+    ): Promise<SMTPTransport.SentMessageInfo>
     {
         const { email, name } = job.data as WellcomeMail;
 
         return this.sendMail( email, 'Welcome to My App', {
             body: {
                 name,
-
-                intro: 'Welcome to My App! We’re glad to have you with us.',
-
+                intro: 'Welcome to My App!',
                 action: {
-                    instructions:
-                        'Your account has been successfully created. You can now sign in and start exploring all the features available to you.',
-
+                    instructions: 'You can now start using your account.',
                     button: {
-                        text: 'Get Started',
-                        link: process.env.APP_URL as string,
+                        text: 'Visit My App',
+                        link: 'https://example.com',
                     },
                 },
-
-                outro:
-                    'If you have any questions or need assistance, our support team is always here to help. We look forward to having you with us!',
+                outro: 'If you have any questions, feel free to contact us.',
             },
         } );
     }
 
     private async sendVerifyEmailMail (
         job: Job,
-    )
+    ): Promise<SMTPTransport.SentMessageInfo>
     {
         const { email, otp } = job.data as VerifyEmail;
 
         return this.sendMail( email, 'Verify your email address', {
             body: {
-                intro:
-                    'Welcome to My App! Please verify your email address to complete your registration.',
-
+                name: email,
+                intro: 'Welcome to My App!',
                 action: {
                     instructions:
-                        'Use the verification code below to verify your email address. This code will expire shortly.',
-
+                        'Please verify your email address by clicking the button below:',
                     button: {
                         color: '#22BC66',
                         text: otp.toString(),
                         link: '#',
                     },
                 },
-
                 outro:
-                    'If you did not create an account with My App, you can safely ignore this email. Please do not share this verification code with anyone.',
+                    'If you did not create this account, you can safely ignore this email.',
             },
         } );
     }
 
     private async sendResetPasswordMail (
         job: Job,
-    )
+    ): Promise<SMTPTransport.SentMessageInfo>
     {
         const { email, link } = job.data as ResetPassword;
 
@@ -179,7 +171,7 @@ export class MailProcessor extends WorkerHost
 
     private async sendPasswordChangedMail (
         job: Job,
-    )
+    ): Promise<SMTPTransport.SentMessageInfo>
     {
         const { email } = job.data as ChangedPasswordConfirmation;
 

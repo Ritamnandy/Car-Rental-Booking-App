@@ -104,7 +104,7 @@ export class AuthService
       this.mailService.sendVerifyEmailMail( data.email, otp )
     ] )
 
-    this.logger.log( `OTP sent to ${ data.email } for verify email` )
+    this.logger.log( `OTP for verify email ${ data.email }` )
     return {
       message: 'OTP sent successfully , please verify your email',
       success: true
@@ -317,7 +317,7 @@ export class AuthService
     {
       throw new BadRequestException( 'User not found with this id' )
     }
-    
+
     await this.redisService.set( `user:${ userId }`, JSON.stringify( {
       id: result.id,
       email: result.email,

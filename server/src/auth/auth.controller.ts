@@ -55,6 +55,8 @@ export class AuthController
   @HttpCode( HttpStatus.ACCEPTED )
   async registerUser ( @Body() data: CreateAuthDto )
   {
+    console.log( data );
+
     const result = await this.authService.registerUser( data );
     return result;
   }
