@@ -16,6 +16,7 @@ enum UserRole {
   ADMIN
   USER
 }
+
 enum UserStatus {
   PENDING
   ACTIVE
@@ -24,17 +25,17 @@ enum UserStatus {
 }
 
 model User {
-  id           String    @id @default(cuid()) @map("user_id")
-  name         String    @map("user_name") @db.VarChar(50)
-  email        String    @unique @map("user_email") @db.VarChar(100)
-  password     String    @map("user_password") @db.VarChar(255)
-  isVerified   Boolean   @default(false) @map("is_verified")
-  role         UserRole  @default(USER) @map("role")
-  profileImage String?   @map("profile_image") @db.VarChar(255)
-  refreshToken String?   @unique() @map("refresh_token") @db.VarChar(255)
+  id           String     @id @default(cuid()) @map("user_id")
+  name         String     @map("user_name") @db.VarChar(50)
+  email        String     @unique @map("user_email") @db.VarChar(255)
+  password     String     @map("user_password") @db.Text
+  isVerified   Boolean    @default(false) @map("is_verified")
+  role         UserRole   @default(USER) @map("role")
+  profileImage String?    @map("profile_image") @db.Text
+  refreshToken String?    @unique() @map("refresh_token") @db.Text
   status       UserStatus @default(PENDING) @map("status")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt
   cars         Car[]
   bookings     Booking[]
 
@@ -137,7 +138,7 @@ model Car {
   owner            User         @relation(fields: [ownerId], references: [id])
   brand            String       @map("car_brand") @db.VarChar(50)
   model            String       @map("car_model") @db.VarChar(50)
-  image            String?      @map("car_image") @db.VarChar(255)
+  image            String?      @map("car_image") @db.Text
   year             Int          @map("car_year")
   category         CarCategory  @map("car_category")
   seating_capacity Int          @default(0) @map("seating_capacity")
@@ -160,6 +161,7 @@ enum BookingStatus {
   COMPLETED
   CANCELLED
 }
+
 enum PaymentMethod {
   CREDIT_CARD
   DEBIT_CARD
@@ -169,18 +171,18 @@ enum PaymentMethod {
 }
 
 model Booking {
-  id         String   @id @default(cuid()) @map("booking_id")
-  userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
-  carId      String   @map("car_id")
-  car        Car      @relation(fields: [carId], references: [id])
-  pickupDate DateTime @map("start_date")
-  returnDate DateTime @map("end_date")
+  id         String        @id @default(cuid()) @map("booking_id")
+  userId     String        @map("user_id")
+  user       User          @relation(fields: [userId], references: [id])
+  carId      String        @map("car_id")
+  car        Car           @relation(fields: [carId], references: [id])
+  pickupDate DateTime      @map("start_date")
+  returnDate DateTime      @map("end_date")
   paymentBy  PaymentMethod @map("payment_by")
-  price      Float    @map("total_price")
-  status     String   @default("pending") @map("status") @db.VarChar(20)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt
+  price      Float         @map("total_price")
+  status     String        @default("pending") @map("status") @db.VarChar(20)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt
 
   @@index([status])
   @@map("bookings")
