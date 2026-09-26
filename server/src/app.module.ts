@@ -6,7 +6,9 @@ import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module.js';
 import {JwtModule} from '@nestjs/jwt'
 import { RedisService } from './redis/redis.service.js';
-import {BullModule} from '@nestjs/bullmq'
+import { BullModule } from '@nestjs/bullmq'
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +17,14 @@ import {BullModule} from '@nestjs/bullmq'
     
     JwtModule.register({
       global: true,
+    } ),
+    ThrottlerModule.forRoot( {
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
     } ),
     
     PrismaModule,
@@ -29,6 +39,11 @@ import {BullModule} from '@nestjs/bullmq'
     } ),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}

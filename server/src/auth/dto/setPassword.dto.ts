@@ -14,5 +14,5 @@ export class SetPasswordDto
 
     @IsNotEmpty()
     @IsString()
-    confirmPassword: string
+    token: string
 }

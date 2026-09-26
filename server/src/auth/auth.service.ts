@@ -307,11 +307,24 @@ export class AuthService
 
   async getCurrentUser ( userId: string )
   {
+    const cachedUser = await this.redisService.get( `user:${ userId }` )
+    if ( cachedUser )
+    {
+      return apiUserMessage( true, 'User found', JSON.parse( cachedUser ) )
+    }
     const result = await this.authRepository.findUserById( userId )
     if ( !result )
     {
       throw new BadRequestException( 'User not found with this id' )
     }
+    
+    await this.redisService.set( `user:${ userId }`, JSON.stringify( {
+      id: result.id,
+      email: result.email,
+      name: result.name,
+      createAt: result.createdAt
+    } ), 60 * 10 )
+
     return apiUserMessage( true, 'User found', {
       id: result.id,
       email: result.email,
