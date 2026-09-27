@@ -146,7 +146,7 @@ export class AuthController
       ttl: 60_000,
     },
   } )
-  @Post( 'forgot-password' )
+  @Post( 'forget-password' )
   @HttpCode( HttpStatus.OK )
   async forgotPassword ( @Body() data: ResendOtpDto )
   {
@@ -161,7 +161,7 @@ export class AuthController
       ttl: 60_000,
     },
   } )
-  @Post( 'reset-password' )
+  @Patch( 'reset-password' )
   @HttpCode( HttpStatus.OK )
   async resetPassword ( @Body() data: SetPasswordDto )
   {
