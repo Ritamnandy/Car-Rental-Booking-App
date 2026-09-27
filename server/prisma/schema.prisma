@@ -135,7 +135,7 @@ enum Location {
 model Car {
   id               String       @id @default(cuid()) @map("car_id")
   ownerId          String       @map("owner_id")
-  owner            User         @relation(fields: [ownerId], references: [id])
+  owner            User         @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   brand            String       @map("car_brand") @db.VarChar(50)
   model            String       @map("car_model") @db.VarChar(50)
   image            String?      @map("car_image") @db.Text
@@ -152,6 +152,10 @@ model Car {
   updatedAt        DateTime     @updatedAt
   bookings         Booking[]
 
+  @@index([ownerId, isAvailable])
+  @@index([location, isAvailable])
+  @@index([seating_capacity])
+  @@index([pricePerDay])
   @@map("cars")
 }
 
@@ -173,9 +177,9 @@ enum PaymentMethod {
 model Booking {
   id         String        @id @default(cuid()) @map("booking_id")
   userId     String        @map("user_id")
-  user       User          @relation(fields: [userId], references: [id])
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   carId      String        @map("car_id")
-  car        Car           @relation(fields: [carId], references: [id])
+  car        Car           @relation(fields: [carId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   pickupDate DateTime      @map("start_date")
   returnDate DateTime      @map("end_date")
   paymentBy  PaymentMethod @map("payment_by")

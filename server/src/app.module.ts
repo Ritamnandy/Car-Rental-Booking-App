@@ -9,10 +9,14 @@ import { RedisService } from './redis/redis.service.js';
 import { BullModule } from '@nestjs/bullmq'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { CarsModule } from './cars/cars.module.js';
+import { ImagesModule } from './images/images.module.js';
+import imagekitConfig from './config/imagekit.config.js';
 @Module( {
   imports: [
     ConfigModule.forRoot( {
       isGlobal: true,
+      load: [imagekitConfig]
     } ),
 
     JwtModule.register( {
@@ -38,6 +42,8 @@ import { APP_GUARD } from '@nestjs/core';
       } ),
       inject: [ RedisService ],
     } ),
+    CarsModule,
+    ImagesModule,
   ],
   controllers: [],
   providers: [
