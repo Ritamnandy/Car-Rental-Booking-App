@@ -180,11 +180,11 @@ model Booking {
   user       User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   carId      String        @map("car_id")
   car        Car           @relation(fields: [carId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  pickupDate DateTime      @map("start_date")
-  returnDate DateTime      @map("end_date")
+  pickupDate DateTime      @map("pickup_date")
+  returnDate DateTime      @map("return_date")
   paymentBy  PaymentMethod @map("payment_by")
-  price      Float         @map("total_price")
-  status     String        @default("pending") @map("status") @db.VarChar(20)
+  price      Float         @map("price")
+  status     BookingStatus @default(PENDING) @map("status")
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt
 

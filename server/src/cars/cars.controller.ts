@@ -7,6 +7,9 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/authguard/auth.guard.js';
 import { Throttle } from '@nestjs/throttler';
 import { CarStatusDto } from './dto/carstatus.dto.js';
+import { RoleGuard } from '../auth/role/role.guard.js';
+import { Roles } from '../auth/role/role/role.decorator.js';
+import { UserRole } from '../generated/prisma/browser.js';
 
 
 @Controller( 'cars' )
@@ -23,6 +26,8 @@ export class CarsController
   } )
   @Post()
   @HttpCode( HttpStatus.CREATED )
+  @UseGuards( RoleGuard )
+  @Roles( UserRole.ADMIN )
   @UseInterceptors(
     FileInterceptor( 'image' ),
   )
@@ -65,6 +70,8 @@ export class CarsController
   } )
   @HttpCode( HttpStatus.OK )
   @Patch( ':id' )
+  @UseGuards( RoleGuard )
+  @Roles( UserRole.ADMIN )
   async update ( @Param( 'id' ) id: string, @Body() data: CarStatusDto )
   {
     return await this.carsService.updateCarStatus( id, data );
@@ -77,11 +84,14 @@ export class CarsController
     },
   } )
   @HttpCode( HttpStatus.OK )
+  @UseGuards( RoleGuard )
+  @Roles( UserRole.ADMIN )
   @Delete( ':id' )
   remove ( @Param( 'id' ) id: string )
   {
     return this.carsService.deleteCar( id );
   }
+
 
   @Throttle( {
     default: {
@@ -90,6 +100,8 @@ export class CarsController
     },
   } )
   @HttpCode( HttpStatus.OK )
+  @UseGuards( RoleGuard )
+  @Roles( UserRole.ADMIN )
   @Get( ':ownerId' )
   async findCarsByOwnerId ( @Param( 'ownerId' ) ownerId: string )
   {
