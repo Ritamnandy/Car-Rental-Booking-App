@@ -6,9 +6,10 @@ import { PrismaModule } from '../prisma/prisma.module.js';
 import { RedisModule } from '../redis/redis.module.js';
 import { MailModule } from '../mail/mail.module.js';
 import { AuthGuard } from './authguard/auth.guard.js';
+import { ImagesModule } from '../images/images.module.js';
 
 @Module( {
-  imports: [ PrismaModule, RedisModule, MailModule ],
+  imports: [ PrismaModule, RedisModule, MailModule,ImagesModule ],
   controllers: [ AuthController ],
   providers: [ AuthService, AuthRepository, AuthGuard ],
   exports: [ AuthGuard ]
