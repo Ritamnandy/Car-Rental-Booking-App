@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, Req, Res, UploadedFile, UseGuards } from '@nestjs/common';
 import type { Response } from 'express'
 import { AuthService } from './auth.service.js';
 import { CreateAuthDto } from './dto/create-auth.dto.js';
@@ -10,6 +10,8 @@ import type { AuthenticatedRequest } from './types/auth-request.types.js';
 import { SetPasswordDto } from './dto/setPassword.dto.js';
 import { AuthGuard } from './authguard/auth.guard.js';
 import { Throttle } from '@nestjs/throttler';
+import { Roles } from './role/role/role.decorator.js';
+import { UserRole } from '../generated/prisma/browser.js';
 
 
 @Controller( 'auth' )
@@ -178,11 +180,27 @@ export class AuthController
   @Get( 'profile' )
   @HttpCode( HttpStatus.OK )
   @UseGuards( AuthGuard )
+  @Roles( UserRole.ADMIN )
   async getProfile ( @Req() req: AuthenticatedRequest )
   {
     return await this.authService.getCurrentUser( req.user.id );
   }
 
+
+  @Throttle( {
+    default: {
+      limit: 10, // limit each IP to 5 requests per `window`
+      ttl: 60_000,
+    },
+  } )
+  @Post( 'profile-image' )
+  @HttpCode( HttpStatus.OK )
+  @UseGuards( AuthGuard )
+  @Roles( UserRole.ADMIN )
+  async setProfileImage ( @Req() req: AuthenticatedRequest, @UploadedFile() file: Express.Multer.File )
+  {
+    return await this.authService.setUserImage( file, req.user.id );
+  }
 
 
 }

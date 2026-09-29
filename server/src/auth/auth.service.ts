@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, Logger, UnauthorizedException, UploadedFile } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto.js';
 import { RedisService } from '../redis/redis.service.js';
 import { MailService } from '../mail/mail.service.js';
@@ -12,6 +12,7 @@ import { StringValue } from 'ms';
 import type { LoginDto } from './dto/login.dto.js';
 import type { ResendOtpDto } from './dto/resend.dto.js';
 import type { SetPasswordDto } from './dto/setPassword.dto.js';
+import type { ImageService } from '../images/images.service.js';
 
 @Injectable()
 export class AuthService
@@ -23,7 +24,8 @@ export class AuthService
     private readonly mailService: MailService,
     private readonly configService: ConfigService,
     private readonly authRepository: AuthRepository,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly imageService: ImageService
   )
   {
     this.logger.log( 'AuthService initialized' );
@@ -332,6 +334,26 @@ export class AuthService
       createAt: result.createdAt
     } )
   }
+
+
+  async setUserImage ( @UploadedFile() file: Express.Multer.File, userId: string )
+  {
+    const imageResult = await this.imageService.uploadImage( file, '/user-profile/image' );
+    if ( !imageResult || !imageResult.url )
+    {
+      throw new ConflictException( 'Failed to upload image, please try again later' );
+    }
+
+    const response = await this.authRepository.setUserProfileImage( userId, imageResult.url )
+
+    if ( !response )
+    {
+      throw new BadRequestException( 'Failed to set user profile image, please try again later' )
+
+    }
+    return apiUserMessage( true, 'User profile image set successfully', { imageUrl: response.profileImage } )
+  }
+
 
 
 }
