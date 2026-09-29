@@ -65,6 +65,8 @@ export class AuthGuard implements CanActivate
   private extractToken ( request: AuthenticatedRequest ): string | undefined
   {
     const cookieHeader = request.cookies[ 'accessToken' ]
+    console.log( "inside cookie:-",cookieHeader);
+    
     if ( cookieHeader )
     {
       return cookieHeader
@@ -81,6 +83,8 @@ export class AuthGuard implements CanActivate
       return undefined
     }
     const [ type, token ] = authHeader.split( ' ' )
+    console.log("inside header:-", type );
+    console.log( "inside header:-",token );
     if ( type !== 'Bearer' )
     {
       return undefined

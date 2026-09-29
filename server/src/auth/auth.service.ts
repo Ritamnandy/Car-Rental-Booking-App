@@ -40,7 +40,6 @@ export class AuthService
     const refresh: JwtRefreshPayload = {
       id: payload.id,
       email: payload.email,
-      refreshToken: payload.refreshToken,
       role: payload.role
     }
     return { jwt, refresh };
@@ -160,7 +159,6 @@ export class AuthService
       email: result.email,
       id: result.id,
       role: result.role,
-      refreshToken: result.refreshToken
     } )
 
     const { accessToken, refreshToken } = await this.genarateTokenPair( accessTokenPayload, refreshTokenPayload )
@@ -200,7 +198,6 @@ export class AuthService
       email: result.email,
       id: result.id,
       role: result.role,
-      refreshToken: result.refreshToken
     } )
 
     const { accessToken, refreshToken } = await this.genarateTokenPair( accessTokenPayload, refreshTokenPayload )
@@ -245,7 +242,6 @@ export class AuthService
       email: result.email,
       id: result.id,
       role: result.role,
-      refreshToken: result.refreshToken
     } )
 
     const { accessToken, refreshToken } = await this.genarateTokenPair( accessTokenPayload, refreshTokenPayload )
@@ -309,10 +305,10 @@ export class AuthService
 
   async getCurrentUser ( userId: string )
   {
-    const cachedUser = await this.redisService.get( `user:${ userId }` )
+    const cachedUser = await this.redisService.get( `user-profile:${ userId }` )
     if ( cachedUser )
     {
-      return apiUserMessage( true, 'User found', JSON.parse( cachedUser ) )
+      return apiUserMessage( true, 'User found', JSON.parse( cachedUser ) as object )
     }
     const result = await this.authRepository.findUserById( userId )
     if ( !result )
@@ -320,7 +316,7 @@ export class AuthService
       throw new BadRequestException( 'User not found with this id' )
     }
 
-    await this.redisService.set( `user:${ userId }`, JSON.stringify( {
+    await this.redisService.set( `user-profile:${ userId }`, JSON.stringify( {
       id: result.id,
       email: result.email,
       name: result.name,
@@ -338,6 +334,11 @@ export class AuthService
 
   async setUserImage ( @UploadedFile() file: Express.Multer.File, userId: string )
   {
+    const totalStart = performance.now();
+
+    console.log( 'File received:', file.size );
+
+    
     const imageResult = await this.imageService.uploadImage( file, '/user-profile/image' );
     if ( !imageResult || !imageResult.url )
     {

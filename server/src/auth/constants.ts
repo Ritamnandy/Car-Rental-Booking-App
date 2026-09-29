@@ -35,6 +35,7 @@ const hashedCryptoToken = ( token: string ) => crypto.createHash( "sha256" ).upd
 
 const apiUserMessage = ( success: boolean, message: string, user?: object, accessToken?: string, refreshToken?: string ) =>
 {
+    
     if ( user && accessToken && refreshToken )
     {
         return {
@@ -55,7 +56,14 @@ const apiUserMessage = ( success: boolean, message: string, user?: object, acces
             refreshToken,
         }
     }
-
+    if ( user )
+    {
+        return {
+            success,
+            message,
+            user
+        }
+    }
     return {
         success,
         message,
@@ -65,7 +73,7 @@ const apiUserMessage = ( success: boolean, message: string, user?: object, acces
 
 const hashPasword = async ( password: string ) =>
 {
-    return await bcrypt.hash( password, 13 )
+    return await bcrypt.hash( password, 10 )
 }
 
 const comparePassword = async ( password: string, hashedPassword: string ) =>

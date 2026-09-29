@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, Req, Res, UploadedFile, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import type { Response } from 'express'
 import { AuthService } from './auth.service.js';
 import { CreateAuthDto } from './dto/create-auth.dto.js';
@@ -12,6 +12,8 @@ import { AuthGuard } from './authguard/auth.guard.js';
 import { Throttle } from '@nestjs/throttler';
 import { Roles } from './role/role.decorator.js';
 import { UserRole } from '../generated/prisma/browser.js';
+import { RoleGuard } from './roleguard/role.guard.js';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @Controller( 'auth' )
@@ -33,7 +35,7 @@ export class AuthController
       path: '/',
     } );
 
-    res.cookie( 'accessToken', refreshToken, {
+    res.cookie( 'refreshToken', refreshToken, {
       httpOnly: true,
       secure: isProd,
       sameSite: 'strict',
@@ -179,7 +181,7 @@ export class AuthController
   } )
   @Get( 'profile' )
   @HttpCode( HttpStatus.OK )
-  @UseGuards( AuthGuard )
+  @UseGuards(AuthGuard, RoleGuard )
   @Roles( UserRole.ADMIN )
   async getProfile ( @Req() req: AuthenticatedRequest )
   {
@@ -195,10 +197,15 @@ export class AuthController
   } )
   @Post( 'profile-image' )
   @HttpCode( HttpStatus.OK )
+  @UseInterceptors(
+    FileInterceptor( 'profileImage' ),
+  )
   @UseGuards( AuthGuard )
   @Roles( UserRole.ADMIN )
   async setProfileImage ( @Req() req: AuthenticatedRequest, @UploadedFile() file: Express.Multer.File )
   {
+    console.log(file);
+    
     return await this.authService.setUserImage( file, req.user.id );
   }
 

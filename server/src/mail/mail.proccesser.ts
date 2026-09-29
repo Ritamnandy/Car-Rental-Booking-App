@@ -89,13 +89,20 @@ export class MailProcessor extends WorkerHost
         const html = this.mailgen.generate( emailBody ) as string;
         const text = this.mailgen.generatePlaintext( emailBody ) as string;
         this.logger.log( 'Sending email', { to: to } );
-        return this.transporter.sendMail( {
+        const info = await this.transporter.sendMail( {
             from: process.env.APP_EMAIL,
             to,
             subject,
             html,
             text,
         } );
+        this.logger.log( {
+            messageId: ( await info ).messageId,
+            response: ( await info ).response,
+            accepted: ( await info ).accepted,
+            rejected: ( await info ).rejected,
+        } );
+        return info;
     }
 
     private async sendWelcomeEmail (

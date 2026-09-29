@@ -9,5 +9,4 @@ export type JwtRefreshPayload = {
     id: string;
     email: string;
     role: string;
-    refreshToken: string | null;
 };

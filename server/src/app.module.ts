@@ -27,7 +27,7 @@ import imagekitConfig from './config/imagekit.config.js';
       throttlers: [
         {
           ttl: 60000,
-          limit: 10,
+          limit: 15,
         },
       ],
     } ),
