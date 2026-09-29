@@ -9,10 +9,10 @@ import { apiUserMessage, comparePassword, genarateOtp, hashedCryptoToken, hashPa
 import { VerifyEmailDto } from './dto/verifyEmail.dto.js';
 import type { JwtPayload, JwtRefreshPayload } from './types/payload.types.js';
 import { StringValue } from 'ms';
-import type { LoginDto } from './dto/login.dto.js';
-import type { ResendOtpDto } from './dto/resend.dto.js';
-import type { SetPasswordDto } from './dto/setPassword.dto.js';
-import type { ImageService } from '../images/images.service.js';
+import { LoginDto } from './dto/login.dto.js';
+import { ResendOtpDto } from './dto/resend.dto.js';
+import { SetPasswordDto } from './dto/setPassword.dto.js';
+import { ImageService } from '../images/images.service.js';
 
 @Injectable()
 export class AuthService
@@ -206,7 +206,7 @@ export class AuthService
     const { accessToken, refreshToken } = await this.genarateTokenPair( accessTokenPayload, refreshTokenPayload )
 
     this.logger.log( `User logged in successfully with email ${ data.email }` )
-
+    await this.mailService.sendWelcomeMail( result.email, result.name )
     return apiUserMessage( true, 'User logged in successfully', {
       id: result.id,
       name: result.name,

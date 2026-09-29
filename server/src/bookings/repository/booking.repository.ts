@@ -1,8 +1,8 @@
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
-import type { PrismaService } from "../../prisma/prisma.service.js";
+import  { PrismaService } from "../../prisma/prisma.service.js";
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/client";
-import type { CreateBookingDto } from "../dto/create-booking.dto.js";
-import type { BookingStatusDto } from "../dto/booking-status.dto.js";
+import  { CreateBookingDto } from "../dto/create-booking.dto.js";
+import  { BookingStatusDto } from "../dto/booking-status.dto.js";
 
 
 

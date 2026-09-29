@@ -11,7 +11,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { CarsModule } from './cars/cars.module.js';
 import { ImagesModule } from './images/images.module.js';
-import { BookingsModule } from './bookings/bookings.module';
+import { BookingsModule } from './bookings/bookings.module.js';
 import imagekitConfig from './config/imagekit.config.js';
 @Module( {
   imports: [

@@ -2,12 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Http
 import { BookingsService } from './bookings.service.js';
 import { CreateBookingDto } from './dto/create-booking.dto.js';
 import type { AuthenticatedRequest } from '../auth/types/auth-request.types.js';
-import type { BookingStatusDto } from './dto/booking-status.dto.js';
+import  { BookingStatusDto } from './dto/booking-status.dto.js';
 import { AuthGuard } from '../auth/authguard/auth.guard.js';
-import { RoleGuard } from '../auth/role/role.guard.js';
-import { Roles } from '../auth/role/role/role.decorator.js';
+
 import { UserRole } from '../generated/prisma/browser.js';
 import { Throttle } from '@nestjs/throttler';
+import { RoleGuard } from '../auth/roleguard/role.guard.js';
+import { Roles } from '../auth/role/role.decorator.js';
 
 
 @Controller( 'bookings' )

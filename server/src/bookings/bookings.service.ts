@@ -1,8 +1,8 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import type { CreateBookingDto } from './dto/create-booking.dto.js';
-import type { BookingRepository } from './repository/booking.repository.js';
-import type { RedisService } from '../redis/redis.service.js';
-import type { BookingStatusDto } from './dto/booking-status.dto.js';
+import  { CreateBookingDto } from './dto/create-booking.dto.js';
+import  { BookingRepository } from './repository/booking.repository.js';
+import  { RedisService } from '../redis/redis.service.js';
+import  { BookingStatusDto } from './dto/booking-status.dto.js';
 
 
 @Injectable()

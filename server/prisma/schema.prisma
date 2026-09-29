@@ -32,7 +32,7 @@ model User {
   isVerified   Boolean    @default(false) @map("is_verified")
   role         UserRole   @default(USER) @map("role")
   profileImage String?    @map("profile_image") @db.Text
-  refreshToken String?    @unique() @map("refresh_token") @db.Text
+  refreshToken String?    @map("refresh_token") @db.Text
   status       UserStatus @default(PENDING) @map("status")
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt

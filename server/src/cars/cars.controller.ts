@@ -7,9 +7,10 @@ import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/authguard/auth.guard.js';
 import { Throttle } from '@nestjs/throttler';
 import { CarStatusDto } from './dto/carstatus.dto.js';
-import { RoleGuard } from '../auth/role/role.guard.js';
-import { Roles } from '../auth/role/role/role.decorator.js';
+
 import { UserRole } from '../generated/prisma/browser.js';
+import { RoleGuard } from '../auth/roleguard/role.guard.js';
+import { Roles } from '../auth/role/role.decorator.js';
 
 
 @Controller( 'cars' )

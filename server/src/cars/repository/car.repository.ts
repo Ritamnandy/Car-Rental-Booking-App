@@ -114,7 +114,7 @@ export class CarRepository
                     bookings: {
                         none: {
                             status: {
-                                in: [ 'pending', 'confirmed' ],
+                                in: [ 'PENDING', 'CONFIRMED' ],
                             },
                         },
                     },

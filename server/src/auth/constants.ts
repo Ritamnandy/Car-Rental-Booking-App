@@ -6,7 +6,7 @@ const genarateOtp = (): string =>
     return crypto.randomInt( 100000, 999999 ).toString()
 }
 
-const OTP_EXPIRY = 5 * 60; // 5 minutes
+const OTP_EXPIRY = 10 * 60; // 10 minutes
 
 const REGISTER_DATA_EXPIRY = 20 * 60 // 20 minutes
 

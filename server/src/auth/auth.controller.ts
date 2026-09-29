@@ -10,7 +10,7 @@ import type { AuthenticatedRequest } from './types/auth-request.types.js';
 import { SetPasswordDto } from './dto/setPassword.dto.js';
 import { AuthGuard } from './authguard/auth.guard.js';
 import { Throttle } from '@nestjs/throttler';
-import { Roles } from './role/role/role.decorator.js';
+import { Roles } from './role/role.decorator.js';
 import { UserRole } from '../generated/prisma/browser.js';
 
 
@@ -57,8 +57,6 @@ export class AuthController
   @HttpCode( HttpStatus.ACCEPTED )
   async registerUser ( @Body() data: CreateAuthDto )
   {
-    console.log( data );
-
     const result = await this.authService.registerUser( data );
     return result;
   }
@@ -86,9 +84,11 @@ export class AuthController
   } )
   @Post( 'verify' )
   @HttpCode( HttpStatus.CREATED )
-  async verifyUser ( @Body() data: VerifyEmailDto, @Res() res: Response )
+  async verifyUser ( @Body() data: VerifyEmailDto, @Res( { passthrough: true } ) res: Response )
   {
     const result = await this.authService.verifyEmail( data );
+    console.log(result);
+    
     this.setAuthCookies( res, result.accessToken ?? '', result.refreshToken ?? '' );
     return result;
   }
@@ -101,7 +101,7 @@ export class AuthController
   } )
   @Post( 'login' )
   @HttpCode( HttpStatus.OK )
-  async login ( @Body() data: LoginDto, @Res() res: Response )
+  async login ( @Body() data: LoginDto, @Res( { passthrough: true } ) res: Response )
   {
     const result = await this.authService.loginUser( data );
     this.setAuthCookies( res, result.accessToken ?? '', result.refreshToken ?? '' );
@@ -116,7 +116,7 @@ export class AuthController
   } )
   @Patch( 'refresh-access-token' )
   @HttpCode( HttpStatus.OK )
-  async refreshAccessToken ( @Body() data: RefreshTokenDto, @Res() res: Response )
+  async refreshAccessToken ( @Body() data: RefreshTokenDto, @Res( { passthrough: true } ) res: Response )
   {
     const result = await this.authService.refreshAccessToken( data.refreshToken );
     this.setAuthCookies( res, result.accessToken ?? '', result.refreshToken ?? '' );
@@ -133,7 +133,7 @@ export class AuthController
   @Delete( 'logout' )
   @HttpCode( HttpStatus.OK )
   @UseGuards( AuthGuard )
-  async logout ( @Res() res: Response, @Req() req: AuthenticatedRequest )
+  async logout ( @Res( { passthrough: true } ) res: Response, @Req() req: AuthenticatedRequest )
   {
     const response = await this.authService.logOutUser( req.user.id );
     res.clearCookie( 'accessToken' );

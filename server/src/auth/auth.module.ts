@@ -7,11 +7,13 @@ import { RedisModule } from '../redis/redis.module.js';
 import { MailModule } from '../mail/mail.module.js';
 import { AuthGuard } from './authguard/auth.guard.js';
 import { ImagesModule } from '../images/images.module.js';
+import { RoleGuard } from './roleguard/role.guard.js';
+
 
 @Module( {
   imports: [ PrismaModule, RedisModule, MailModule,ImagesModule ],
   controllers: [ AuthController ],
-  providers: [ AuthService, AuthRepository, AuthGuard ],
-  exports: [ AuthGuard ]
+  providers: [ AuthService, AuthRepository, AuthGuard,RoleGuard ],
+  exports: [ AuthGuard,RoleGuard ]
 } )
 export class AuthModule { }
