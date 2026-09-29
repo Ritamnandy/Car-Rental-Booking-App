@@ -14,7 +14,7 @@ import { Roles } from '../auth/role/role.decorator.js';
 
 
 @Controller( 'cars' )
-@UseGuards( AuthGuard )
+@UseGuards( AuthGuard,RoleGuard )
 export class CarsController
 {
   constructor ( private readonly carsService: CarsService ) { }
@@ -27,7 +27,6 @@ export class CarsController
   } )
   @Post()
   @HttpCode( HttpStatus.CREATED )
-  @UseGuards( RoleGuard )
   @Roles( UserRole.ADMIN )
   @UseInterceptors(
     FileInterceptor( 'image' ),
@@ -44,6 +43,7 @@ export class CarsController
     },
   } )
   @HttpCode( HttpStatus.OK )
+  @Roles( UserRole.USER, UserRole.ADMIN )
   @Get()
   async findAll ()
   {
@@ -57,6 +57,7 @@ export class CarsController
     },
   } )
   @HttpCode( HttpStatus.OK )
+  @Roles( UserRole.USER, UserRole.ADMIN )
   @Get( ':id' )
   async findOne ( @Param( 'id' ) id: string )
   {
@@ -71,7 +72,6 @@ export class CarsController
   } )
   @HttpCode( HttpStatus.OK )
   @Patch( ':id' )
-  @UseGuards( RoleGuard )
   @Roles( UserRole.ADMIN )
   async update ( @Param( 'id' ) id: string, @Body() data: CarStatusDto )
   {
@@ -85,7 +85,6 @@ export class CarsController
     },
   } )
   @HttpCode( HttpStatus.OK )
-  @UseGuards( RoleGuard )
   @Roles( UserRole.ADMIN )
   @Delete( ':id' )
   remove ( @Param( 'id' ) id: string )
@@ -101,7 +100,6 @@ export class CarsController
     },
   } )
   @HttpCode( HttpStatus.OK )
-  @UseGuards( RoleGuard )
   @Roles( UserRole.ADMIN )
   @Get( ':ownerId' )
   async findCarsByOwnerId ( @Param( 'ownerId' ) ownerId: string )
