@@ -5,6 +5,7 @@ import { authApiClass } from "../api/auth/AuthApiClass";
 import type { loginData } from "../types/api.types";
 import { useForm } from "react-hook-form";
 import { assets } from "../assets/assets";
+import { useLoginState } from "../hooks/useReduxConfig";
 
 
 type Props = {
@@ -17,6 +18,7 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
 
     const [ loading, setLoading ] = useState( false );
     const [ seenPassword, setSeenPassword ] = useState( false );
+    const { setLoginValue, isLogin } = useLoginState()
     const navigate = useNavigate()
     const {
         register,
@@ -28,32 +30,56 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
 
     const onSubmit = async ( data: loginData ) =>
     {
-        setLoading( true );
-
-        console.log( "Form data:", data );
-
-        try
+        if ( isLogin )
         {
-            const response = await authApiClass.loginUser( {
-                email: data.email,
-                password: data.password,
-            } );
-
-            console.log( "Register response:", response );
-
-            if ( response?.data?.success )
+            try
             {
-                setShowSignup( false );
-                navigate( "/verify-otp" );
+                const response = await authApiClass.logoutUser()
+                console.log( "Logout response:", response );
+
+                if ( response?.data?.success )
+                {
+                    setLoginValue( false );
+                    setShowLogin( false );
+                    navigate( "/" );
+                }
+                return;
+            } catch ( error )
+            {
+                console.log( "Logout error:", error );
+                toast.error( ( error as Error ).message );
             }
-        } catch ( error )
+        } else
         {
-            console.log( "Register error:", error );
-            toast.error( ( error as Error ).message );
-        } finally
-        {
-            setLoading( false );
+            setLoading( true );
+
+            console.log( "Form data:", data );
+
+            try
+            {
+                const response = await authApiClass.loginUser( {
+                    email: data.email,
+                    password: data.password,
+                } );
+
+                console.log( "Register response:", response );
+
+                if ( response?.data?.success )
+                {
+                    setLoginValue( true );
+                    setShowLogin( false );
+                    navigate( "/" );
+                }
+            } catch ( error )
+            {
+                console.log( "Register error:", error );
+                toast.error( ( error as Error ).message );
+            } finally
+            {
+                setLoading( false );
+            }
         }
+
     };
 
 

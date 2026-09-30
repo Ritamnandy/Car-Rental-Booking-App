@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { authApiClass } from "../api/auth/AuthApiClass";
+import { useEmailState } from "../hooks/useReduxConfig";
 
-type Props = {
-    email: string;
-};
 
 const OTP_LENGTH = 6;
 const OTP_EXPIRY_SECONDS = 10 * 60;
@@ -17,7 +15,7 @@ const formatTime = ( total: number ) =>
     return `${ m }:${ s }`;
 };
 
-export default function VerifyOtp ( { email }: Props )
+export default function VerifyOtp (  )
 {
     const navigate = useNavigate();
 
@@ -26,7 +24,7 @@ export default function VerifyOtp ( { email }: Props )
     const [ resending, setResending ] = useState( false );
     const [ secondsLeft, setSecondsLeft ] = useState( OTP_EXPIRY_SECONDS );
     const [ error, setError ] = useState( "" );
-
+    const {email} =useEmailState()
     const inputRefs = useRef<( HTMLInputElement | null )[]>( [] );
 
     // Focus first box on mount

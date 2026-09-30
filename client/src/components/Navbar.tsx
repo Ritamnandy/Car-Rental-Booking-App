@@ -1,6 +1,7 @@
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { assets, menuLinks } from "../assets/assets";
 import { useState } from "react";
+import { useLoginState } from "../hooks/useReduxConfig";
 
 type NavbarProps = {
     setShowLogin: ( show: boolean ) => void;
@@ -10,7 +11,7 @@ type NavbarProps = {
 export default function Navbar ( { setShowLogin }: NavbarProps )
 {
     const location = useLocation()
-
+    const {isLogin}=useLoginState()
     const [ open, setOpen ] = useState( false )
 
     const navigate = useNavigate()
@@ -58,7 +59,7 @@ export default function Navbar ( { setShowLogin }: NavbarProps )
                             }
                             setShowLogin( true )
                         } }
-                        className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">Login</button>
+                        className="cursor-pointer px-8 py-2 bg-primary hover:bg-primary-dull transition-all text-white rounded-lg">{ isLogin ? "Logout" : "Login" }</button>
                 </div>
 
             </div>

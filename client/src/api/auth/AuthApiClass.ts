@@ -1,6 +1,6 @@
 
 import toast from "react-hot-toast";
-import api from "../../config/config";
+import api from "../../config/api.config";
 import type { forgotPasswordData, loginData, registerData, resendOtpData, resetPasswordData, verifyEmailData } from "../../types/api.types";
 import axios from "axios";
 

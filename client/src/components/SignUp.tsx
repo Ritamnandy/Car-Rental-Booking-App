@@ -5,6 +5,7 @@ import { authApiClass } from "../api/auth/AuthApiClass";
 import toast from "react-hot-toast";
 import type { registerData } from "../types/api.types";
 import { assets } from "../assets/assets";
+import { useEmailState } from "../hooks/useReduxConfig";
 
 type Props = {
     setShowSignup: ( show: boolean ) => void;
@@ -21,7 +22,7 @@ export default function SignUp ( {
     const [ loading, setLoading ] = useState( false );
     const [ seenPassword, setSeenPassword ] = useState( false );
     const navigate = useNavigate();
-
+    const { setEmailValue } = useEmailState()
     const {
         register,
         handleSubmit,
@@ -36,6 +37,7 @@ export default function SignUp ( {
 
         console.log( "Form data:", data );
 
+
         try
         {
             const response = await authApiClass.registerUser( {
@@ -49,6 +51,7 @@ export default function SignUp ( {
             if ( response?.data?.success )
             {
                 setShowSignup( false );
+                setEmailValue( data.email );
                 navigate( "/verify-otp" );
             }
         } catch ( error )

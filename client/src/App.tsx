@@ -62,8 +62,8 @@ function App ()
           <Route path="manage-bookings" element={ <ManageBooking /> } />
         </Route>
         <Route path="/forget-password" element={ <ForgetPassword setShowSignup={ setShowSignup } /> } />
-        <Route path="/reset-password" element={ <ResetPassword /> } />
-        <Route path="/verify-otp" element={ <VerifyOtp email="" /> } />
+        <Route path="/reset-password" element={ <ResetPassword setShowLogin={ setShowLogin } /> } />
+        <Route path="/verify-otp" element={ <VerifyOtp  /> } />
         <Route path="*" element={ <NotFound /> } />
       </Routes>
       {
