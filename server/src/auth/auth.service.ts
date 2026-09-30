@@ -89,7 +89,8 @@ export class AuthService
     }
   }
 
-  async test () {
+  async test ()
+  {
     return apiUserMessage( true, 'this is a test message from backend service' );
   }
 
@@ -317,6 +318,7 @@ export class AuthService
       id: result.id,
       email: result.email,
       name: result.name,
+      image: result.profileImage,
       createAt: result.createdAt
     } ), 60 * 10 )
 
@@ -324,7 +326,8 @@ export class AuthService
       id: result.id,
       email: result.email,
       name: result.name,
-      createAt: result.createdAt
+      createAt: result.createdAt,
+      image: result.profileImage,
     } )
   }
 
@@ -335,7 +338,7 @@ export class AuthService
 
     console.log( 'File received:', file.size );
 
-    
+
     const imageResult = await this.imageService.uploadImage( file, '/user-profile/image' );
     if ( !imageResult || !imageResult.url )
     {
