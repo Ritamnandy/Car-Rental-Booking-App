@@ -161,7 +161,7 @@ export class CarRepository
         {
             return await this.prismaService.car.findMany( {
                 where: {
-                    ownerId,
+                    ownerId: ownerId,
                 },
             } );
         } catch ( error )

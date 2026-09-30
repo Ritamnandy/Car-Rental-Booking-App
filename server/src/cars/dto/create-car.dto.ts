@@ -1,6 +1,6 @@
-import { IsDecimal, IsEnum, IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
+import { IsEnum, IsInt, IsNotEmpty, IsNumber, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import { CarCategory, FuelType, Location, Transmission } from "../../generated/prisma/enums.js";
-
+import { Type } from 'class-transformer';
 export class CreateCarDto
 {
     @IsNotEmpty()
@@ -11,9 +11,10 @@ export class CreateCarDto
     @IsString()
     model: string;
 
-    @IsNotEmpty()
-    @IsNumber()
-    @Length( 4, 4 )
+    @Type( () => Number )
+    @IsInt()
+    @Min( 1900 )
+    @Max( 2100 )
     year: number;
 
     @IsNotEmpty()
@@ -21,8 +22,9 @@ export class CreateCarDto
     category: CarCategory;
 
 
-    @IsNotEmpty()
+    @Type( () => Number )
     @IsNumber()
+    @Min( 2 )
     seating_capacity: number;
 
     @IsNotEmpty()
@@ -33,8 +35,9 @@ export class CreateCarDto
     @IsEnum( Transmission )
     transmission: Transmission;
 
-    @IsNotEmpty()
-    @IsDecimal()
+    @Type( () => Number )
+    @IsNumber()
+    @Min( 50 )
     pricePerDay: number;
 
     @IsNotEmpty()
@@ -43,5 +46,7 @@ export class CreateCarDto
 
     @IsNotEmpty()
     @IsString()
+    @MinLength( 10 )
+    @MaxLength( 500 )
     description: string;
 }

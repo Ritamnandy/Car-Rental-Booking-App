@@ -260,7 +260,7 @@ export class AuthService
 
     const rowToken = rowCryptoToken()
     const hashedToken = hashedCryptoToken( rowToken )
-    const link = ResetPasswordLink( hashedToken, result.email )
+    const link = ResetPasswordLink( rowToken )
 
     await Promise.all( [
       this.redisService.set( resetTokenKey( hashedToken ), result.email, 60 * 10 ),
@@ -275,22 +275,16 @@ export class AuthService
 
   async resetPassword ( data: SetPasswordDto )
   {
-    const result = await this.authRepository.findUserByEmail( data.email )
-    if ( !result )
-    {
-      throw new BadRequestException( 'User not found with this email' )
-    }
-
     const hashedToken = hashedCryptoToken( data.token )
     const cachedEmail = await this.redisService.get( resetTokenKey( hashedToken ) )
     if ( !cachedEmail )
     {
       throw new BadRequestException( 'Invalid or expired reset token' )
     }
-
-    if ( cachedEmail !== data.email )
+    const result = await this.authRepository.findUserByEmail( cachedEmail )
+    if ( !result )
     {
-      throw new BadRequestException( 'Invalid reset token' )
+      throw new BadRequestException( 'User not found with this email' )
     }
 
     const hashedPassword = await hashPasword( data.password )
@@ -299,7 +293,7 @@ export class AuthService
       this.redisService.delete( resetTokenKey( hashedToken ) ),
       this.mailService.sendPasswordChangedMail( result.email )
     ] )
-    this.logger.log( `Password reset successfully for ${ data.email }` )
+    this.logger.log( `Password reset successfully for ${ cachedEmail }` )
     return apiUserMessage( true, 'Password reset successfully' )
   }
 

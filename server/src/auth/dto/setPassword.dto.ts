@@ -4,11 +4,6 @@ export class SetPasswordDto
 {
     @IsNotEmpty()
     @IsString()
-    @IsEmail()
-    email: string
-
-    @IsNotEmpty()
-    @IsString()
     @IsStrongPassword()
     password: string
 

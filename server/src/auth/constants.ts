@@ -24,9 +24,9 @@ const resetTokenKey = ( email: string ) =>
     return `reset-token:${ email }`
 }
 
-const ResetPasswordLink = ( token: string, email: string ) =>
+const ResetPasswordLink = ( token: string ) =>
 {
-    return `${ process.env.FORGET_PASSWORD_URL as string }?token=${ token }&email=${ encodeURIComponent( email ) }`;
+    return `${ process.env.FORGET_PASSWORD_URL as string }?token=${ token }`;
 }
 
 const rowCryptoToken = () => crypto.randomBytes( 32 ).toString( "hex" )

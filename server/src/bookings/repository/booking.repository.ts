@@ -68,7 +68,7 @@ export class BookingRepository
                     pickupDate: data.pickupDate,
                     returnDate: data.returnDate,
                     price: data.price,
-                    status: data.status,
+                    status: "PENDING" as const,
                     paymentBy: data.paymentBy,
                 },
             } );

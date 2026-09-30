@@ -48,7 +48,7 @@ export class CarsService
       return {
         success: true,
         message: 'Cars retrieved from cache',
-        data: cachedData,
+        data: JSON.parse( cachedData ),
       };
     }
     const result = await this.carRepository.getAllCars();
@@ -115,7 +115,7 @@ export class CarsService
       return {
         success: true,
         message: 'Car retrieved from cache',
-        data: cacheCar,
+        data: JSON.parse( cacheCar ),
       };
     }
     const result = await this.carRepository.getCarByOwnerId( ownerId );

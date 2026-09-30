@@ -50,19 +50,19 @@ export class CarsController
     return await this.carsService.findAllCar();
   }
 
-  @Throttle( {
-    default: {
-      limit: 6, // limit each IP to 6 requests per `window`
-      ttl: 60_000,
-    },
-  } )
-  @HttpCode( HttpStatus.OK )
-  @Roles( UserRole.USER, UserRole.ADMIN )
-  @Get( ':id' )
-  async findOne ( @Param( 'id' ) id: string )
-  {
-    return await this.carsService.findOne( id );
-  }
+  // @Throttle( {
+  //   default: {
+  //     limit: 6, // limit each IP to 6 requests per `window`
+  //     ttl: 60_000,
+  //   },
+  // } )
+  // @HttpCode( HttpStatus.OK )
+  // @Roles( UserRole.USER, UserRole.ADMIN )
+  // @Get( ':id' )
+  // async findOne ( @Param( 'id' ) id: string )
+  // {
+  //   return await this.carsService.findOne( id );
+  // }
 
   @Throttle( {
     default: {
