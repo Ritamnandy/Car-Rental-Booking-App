@@ -1,114 +1,183 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Car Rental Booking API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS REST API for the Car Rental Booking App. It manages account verification, JWT-based authentication, cars, bookings, image uploads, email jobs, and caching.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Stack
 
-## Description
+- NestJS 12, TypeScript, Prisma, and PostgreSQL
+- Redis and BullMQ for cache and email queues
+- ImageKit for uploaded images and Nodemailer/Gmail for email
+- Swagger, Helmet, compression, CORS, and request throttling
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Run locally
 
-## Project setup
+From this directory:
 
 ```bash
-$ bun install
+npm install
+docker compose up -d
+npx prisma migrate dev
+npm run start:dev
 ```
 
-## Compile and run the project
+The API starts at `http://localhost:3000` by default. Interactive Swagger documentation is available at `http://localhost:3000/api/docs`.
+
+### Environment variables
+
+Create `server/.env` with values for the services you use. Do not commit this file.
+
+```dotenv
+PORT=3000
+NODE_ENV=development
+COR_ORIGIN=http://localhost:5173
+
+DATABASE_URL=postgresql://<user>:<password>@localhost:5432/<database>
+POSTGRES_USER=<user>
+POSTGRES_PASSWORD=<password>
+POSTGRES_DB=<database>
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+JWT_SECRET=<long-random-secret>
+JWT_EXPIRES_IN=1h
+REFRESH_TOKEN_SECRET=<different-long-random-secret>
+REFRESH_TOKEN_EXPIRES_IN=10d
+FORGET_PASSWORD_URL=http://localhost:5173/forget-password
+
+MAIL_USER=<gmail-address>
+MAIL_PASSWORD=<gmail-app-password>
+APP_EMAIL=<sender-address>
+IMAGEKIT_PRIVATE_KEY=<imagekit-private-key>
+IMAGEKIT_PUBLIC_KEY=<imagekit-public-key>
+IMAGEKIT_URL_ENDPOINT=<imagekit-url-endpoint>
+```
+
+`docker compose up -d` uses the `POSTGRES_*` variables to start PostgreSQL and also starts Redis. Generate the Prisma client after schema changes with `npx prisma generate`.
+
+## API conventions
+
+- **Base URL:** `/api/v1`
+- Requests and responses are JSON unless an endpoint is marked `multipart/form-data`.
+- Validation strips unknown fields and rejects requests containing them. Passwords must satisfy `class-validator`'s `IsStrongPassword` rule.
+- Protected routes accept either the `accessToken` HTTP-only cookie set during login/verification or `Authorization: Bearer <access-token>`.
+- `ADMIN` routes require an authenticated user whose JWT role is `ADMIN`; `USER/ADMIN` means either role is allowed.
+- Auth endpoints are rate-limited to 5 requests/minute (profile image: 10); car endpoints to 6/minute; booking creation to 6/minute and listing/update to 10/minute.
+
+Successful domain responses generally use:
+
+```json
+{ "success": true, "message": "...", "data": {} }
+```
+
+Authentication responses use `user`, `accessToken`, and `refreshToken` where applicable. Standard NestJS validation, authentication, authorization, and not-found errors use their corresponding HTTP status codes.
+
+## Authentication endpoints
+
+| Method | Path | Access | Body / purpose |
+| --- | --- | --- | --- |
+| `POST` | `/auth/register` | Public | `{ name, email, password }`; sends an email OTP. `name` is 3–50 characters. |
+| `POST` | `/auth/resend-otp` | Public | `{ email }`; sends another signup OTP while the registration session is valid. |
+| `POST` | `/auth/verify` | Public | `{ email, otp }`; OTP is exactly 6 characters. Creates the account and sets auth cookies. |
+| `POST` | `/auth/login` | Public | `{ email, password }`; sets auth cookies and returns tokens. |
+| `PATCH` | `/auth/refresh-access-token` | Public | `{ refreshToken }`; validates and rotates the refresh token, then sets new auth cookies. |
+| `DELETE` | `/auth/logout` | Authenticated | Clears auth cookies and invalidates the stored refresh token. |
+| `POST` | `/auth/forget-password` | Public | `{ email }`; queues a password-reset email. |
+| `PATCH` | `/auth/reset-password` | Public | `{ password, token }`; reset token comes from the email link. |
+| `GET` | `/auth/profile` | **ADMIN** | Returns the current admin profile. |
+| `POST` | `/auth/profile-image` | **ADMIN** | `multipart/form-data` with `profileImage`; JPEG, PNG, or WebP, maximum 5 MB. |
+
+Example registration:
+
+```http
+POST /api/v1/auth/register
+Content-Type: application/json
+
+{
+  "name": "Alex Driver",
+  "email": "alex@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+## Car endpoints
+
+Every car endpoint requires authentication. `GET /cars/:ownerId` must be used for an owner identifier; there is currently no public `GET /cars/:id` endpoint.
+
+| Method | Path | Access | Body / purpose |
+| --- | --- | --- | --- |
+| `POST` | `/cars` | **ADMIN** | `multipart/form-data`; creates a car with a `carImage` file and the fields below. |
+| `GET` | `/cars` | USER or ADMIN | Lists all cars. |
+| `PATCH` | `/cars/:id` | **ADMIN** | `{ isAvailable: boolean }`; changes availability. |
+| `DELETE` | `/cars/:id` | **ADMIN** | Deletes a car. |
+| `GET` | `/cars/:ownerId` | **ADMIN** | Lists cars owned by the supplied user ID. |
+
+`POST /cars` form fields:
+
+```text
+brand, model, year, category, seating_capacity, fuelType,
+transmission, pricePerDay, location, description, carImage
+```
+
+Constraints: `year` is 1900–2100; `seating_capacity` is at least 2; `pricePerDay` is at least 50; and `description` is 10–500 characters. Valid enum values are defined in [`prisma/schema.prisma`](./prisma/schema.prisma): `CarCategory`, `FuelType`, `Transmission`, and `Location`.
+
+Example availability update:
+
+```json
+{ "isAvailable": false }
+```
+
+## Booking endpoints
+
+All booking routes require authentication. A user can create and retrieve their own bookings; only an admin can change status.
+
+| Method | Path | Access | Body / purpose |
+| --- | --- | --- | --- |
+| `POST` | `/bookings` | Authenticated | Creates a booking for the current user. |
+| `GET` | `/bookings` | Authenticated | Lists bookings belonging to the current user. |
+| `PATCH` | `/bookings/:id` | **ADMIN** | `{ status }`; updates a booking status. |
+
+Create-booking body:
+
+```json
+{
+  "carId": "car_cuid",
+  "pickupDate": "2026-10-10T09:00:00.000Z",
+  "returnDate": "2026-10-13T09:00:00.000Z",
+  "paymentBy": "UPI",
+  "price": 4500
+}
+```
+
+`paymentBy` must be one of `CREDIT_CARD`, `DEBIT_CARD`, `PAYPAL`, `CASH`, or `UPI`. The booking `status` may be `PENDING`, `CONFIRMED`, `COMPLETED`, or `CANCELLED`.
+
+## Server structure
+
+```text
+server/
+├── prisma/                 # Prisma schema and migrations
+├── src/
+│   ├── auth/               # registration, login, JWT and role guards
+│   ├── bookings/           # booking controller, service, DTOs, repository
+│   ├── cars/               # car controller, service, DTOs, repository
+│   ├── config/             # configuration factories
+│   ├── generated/prisma/   # generated Prisma client (do not edit)
+│   ├── images/             # validation/compression and ImageKit uploads
+│   ├── mail/               # BullMQ email producer and processor
+│   ├── prisma/             # Prisma service/module
+│   ├── redis/              # Redis service/module
+│   ├── app.module.ts       # application composition
+│   └── main.ts             # API prefix, middleware, Swagger, bootstrap
+├── test/                   # end-to-end tests
+├── docker-compose.yml      # local PostgreSQL and Redis
+└── package.json
+```
+
+## Scripts
 
 ```bash
-# development
-$ bun run start
-
-# watch mode
-$ bun run start:dev
-
-# production mode
-$ bun run start:prod
+npm run start:dev  # start with watch mode
+npm run build      # build the server
+npm run lint       # run Oxlint
+npm test           # run unit tests
+npm run test:e2e   # run end-to-end tests
 ```
-
-## Run tests
-
-```bash
-# unit tests
-$ bun run test
-
-# e2e tests
-$ bun run test:e2e
-
-# test coverage
-$ bun run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ bun install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
