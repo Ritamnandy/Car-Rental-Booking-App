@@ -31,7 +31,7 @@ export class AuthController
       httpOnly: true,
       secure: isProd, // must be true in prod (HTTPS); false locally over http
       sameSite: 'strict',
-      maxAge: 1 * 60 * 60 * 1000, // 1 hour — match access token expiry
+      maxAge: 5 * 60 * 60 * 1000, // 1 hour — match access token expiry
       path: '/',
     } );
 
@@ -40,7 +40,7 @@ export class AuthController
       secure: isProd,
       sameSite: 'strict',
       maxAge: 10 * 24 * 60 * 60 * 1000, // 10 days — match refresh token expiry
-      path: '/auth/refresh', // scope it — only sent on the refresh endpoint, reduces exposure
+      path: '/auth/refresh-access-token', // scope it — only sent on the refresh endpoint, reduces exposure
     } );
   }
 
