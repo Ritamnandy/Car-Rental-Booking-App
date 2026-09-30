@@ -109,6 +109,7 @@ export class AuthApiClass
             if ( axios.isAxiosError( error ) )
             {
                 console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message )
                 console.log( "Backend error:", error.response?.data.message );
 
             } else
@@ -133,6 +134,7 @@ export class AuthApiClass
             if ( axios.isAxiosError( error ) )
             {
                 console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
                 console.log( "Backend error:", error.response?.data.message );
 
             } else
@@ -157,6 +159,7 @@ export class AuthApiClass
             if ( axios.isAxiosError( error ) )
             {
                 console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
                 console.log( "Backend error:", error.response?.data.message );
 
             } else
@@ -184,6 +187,7 @@ export class AuthApiClass
             if ( axios.isAxiosError( error ) )
             {
                 console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
                 console.log( "Backend error:", error.response?.data.message );
 
             } else
@@ -212,6 +216,7 @@ export class AuthApiClass
             if ( axios.isAxiosError( error ) )
             {
                 console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
                 console.log( "Backend error:", error.response?.data.message );
 
             } else
@@ -237,6 +242,7 @@ export class AuthApiClass
             if ( axios.isAxiosError( error ) )
             {
                 console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
                 console.log( "Backend error:", error.response?.data.message );
 
             } else
