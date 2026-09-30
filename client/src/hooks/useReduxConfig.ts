@@ -12,9 +12,9 @@ const useLoginState = () =>
 {
     const dispatch = useAppDispatch()
 
-    const isLogin = useAppSelector( ( state ) => state.login )
+    const isLogin = useAppSelector( ( state ) => state.login.isLogin )
 
-    const setLoginValue = ( val: boolean ) => dispatch( setIsLogin( val ) )
+    const setLoginValue = ( val: boolean ) => dispatch( setIsLogin( val ) )    
     return { isLogin, setLoginValue }
 }
 
@@ -22,7 +22,7 @@ const useEmailState = () =>
 {
     const dispatch = useAppDispatch()
 
-    const email = useAppSelector( ( state ) => state.email )
+    const email = useAppSelector( ( state ) => state.email.email )
 
     const setEmailValue = ( val: string ) => dispatch( setEmail( { email: val } ) )
     return { email, setEmailValue }
