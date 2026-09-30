@@ -17,8 +17,10 @@ export default function Hero ()
 
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-10 md:ml-8">
                     <div className="flex flex-col items-start gap-2">
-                        <select name="car-type" id="car-type" required value={ pickupLocation } onChange={ ( e ) => setPickupLocation( e.target.value ) }>
-                            <option value="">Pickup Location</option>
+                        <select defaultValue="Pickup Location" className="select select-ghost select-lg"
+                            onChange={ ( e ) => setPickupLocation( e.target.value ) }
+                        >
+                            <option disabled={ true } value="Pickup Location">Pickup Location</option>
                             {
                                 cityList.map( ( city, index ) => (
                                     <option key={ index } value={ city }>{ city }</option>
@@ -32,15 +34,14 @@ export default function Hero ()
 
                     <div className="flex flex-col items-start gap-2">
                         <label htmlFor="pickup-date">Pick-up Date</label>
-                        <input type="date" name="pickup-date" id="pickup-date" min={ new Date().toISOString().split( 'T' )[ 0 ] } className="text-sm text-gray-500" required />
+                        <input type="date" name="pickup-date" id="pickup-date" min={ new Date().toISOString().split( 'T' )[ 0 ] } className="input input-ghost" required />
                     </div>
 
                     <div className="flex flex-col items-start gap-2">
                         <label htmlFor="return-date">Return Date</label>
-                        <input type="date" name="return-date" id="return-date" min={ new Date().toISOString().split( 'T' )[ 0 ] } className="text-sm text-gray-500" required />
+                        <input type="date" name="return-date" id="return-date" min={ new Date().toISOString().split( 'T' )[ 0 ] } className="input input-ghost" required />
                     </div>
 
-                    
                 </div>
                 <button className="flex items-center justify-center gap-1 px-9 py-3 max-sm:mt-4 bg-primary hover:bg-primary-dull text-white  rounded-full cursor-pointer">
                     <img src={ assets.search_icon } alt="search" className="brightness-300" />

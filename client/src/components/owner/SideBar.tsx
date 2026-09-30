@@ -34,16 +34,16 @@ export default function SideBar ()
 
                     </div>
                 </label>
-
+                
             </div>
-
             {
                 image && (
-                    <button onClick={ updateImage } className="absolute bottom-2 left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2">
+                    <button onClick={ updateImage } className="absolute transform -translate-x-1/20 mt-1 px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 right-0 cursor-pointer">
                         Save <img src={ assets.check_icon } alt="" width={ 13 } />
                     </button>
                 )
             }
+            
             <p className="mt-2 text-base max-md:hidden"> { user?.name }</p>
             <div className="w-full h-px bg-borderColor my-4">
                 { ownerMenuLinks.map( ( link, index ) => (

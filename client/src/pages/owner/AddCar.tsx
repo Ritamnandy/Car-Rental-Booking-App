@@ -1,7 +1,6 @@
 import { useState } from "react"
 import Title from "../../components/owner/Title"
 import { assets } from "../../assets/assets"
-import Lodding from "../../components/Lodding"
 
 
 
@@ -47,7 +46,7 @@ export default function AddCar ()
         <div className="px-4 py-10 md:px-10 flex-1 relative">
             { loading && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60">
-                    <Lodding />
+                    <span className="loading loading-spinner loading-lg text-primary"></span>
                 </div>
             ) }
             <Title title="Add New Car" subtitle="Fill in details to list a new car for booking, including pricing, availability, and car specifications." />
@@ -103,7 +102,7 @@ export default function AddCar ()
 
                     <div className="flex flex-col w-full">
                         <label >Category</label>
-                        <select onChange={ e => setCar( { ...car, category: e.target.value } ) } value={ car.category } className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none">
+                        <select onChange={ e => setCar( { ...car, category: e.target.value } ) } value={ car.category } className="select">
                             <option value="">Select category</option>
 
                             <option value="Sedan">Sedan</option>
@@ -128,7 +127,7 @@ export default function AddCar ()
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <div className="flex flex-col w-full">
                         <label >Transmission</label>
-                        <select onChange={ e => setCar( { ...car, transmission: e.target.value } ) } value={ car.transmission } className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none">
+                        <select onChange={ e => setCar( { ...car, transmission: e.target.value } ) } value={ car.transmission } className="select">
                             <option value="">Select transmission</option>
 
                             <option value="Manual">Manual</option>
@@ -142,7 +141,7 @@ export default function AddCar ()
 
                     <div className="flex flex-col w-full">
                         <label >Fuel Type</label>
-                        <select onChange={ e => setCar( { ...car, fuel_type: e.target.value } ) } value={ car.fuel_type } className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none">
+                        <select onChange={ e => setCar( { ...car, fuel_type: e.target.value } ) } value={ car.fuel_type } className="select">
                             <option value="">Select fuel type</option>
 
                             <option value="Petrol">Petrol</option>
@@ -169,7 +168,7 @@ export default function AddCar ()
                 {/* location */ }
                 <div className="flex flex-col w-full">
                     <label >Location</label>
-                    <select onChange={ e => setCar( { ...car, location: e.target.value } ) } value={ car.location } className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none ">
+                    <select onChange={ e => setCar( { ...car, location: e.target.value } ) } value={ car.location } className="select">
                         <option value="">Select Location</option>
 
                         <option value="Albuquerque">Albuquerque</option>

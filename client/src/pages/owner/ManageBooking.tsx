@@ -70,7 +70,7 @@ export default function ManageBooking ()
                                     <td className="p-3">
                                         {
                                             bookingData.status === 'pending' ? (
-                                                <select value={bookingData.status} className="px-2 py-1.5 mt-1 text-gray-500 border border-borderColor rounded-md outline-none" >
+                                                <select value={bookingData.status} className="select" >
                                                     <option value="pending">Pending</option>
                                                     <option value="canceled">Canceled</option>
                                                     <option value="completed">Completed</option>
