@@ -2,6 +2,8 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { assets, menuLinks } from "../assets/assets";
 import { useState } from "react";
 import { useLoginState } from "../hooks/useReduxConfig";
+import { authApiClass } from "../api/auth/AuthApiClass";
+import toast from "react-hot-toast";
 
 type NavbarProps = {
     setShowLogin: ( show: boolean ) => void;
@@ -11,11 +13,35 @@ type NavbarProps = {
 export default function Navbar ( { setShowLogin }: NavbarProps )
 {
     const location = useLocation()
-    const {isLogin}=useLoginState()
+    const { isLogin, setLoginValue } = useLoginState()
     const [ open, setOpen ] = useState( false )
 
     const navigate = useNavigate()
 
+
+    const onSubmitForLogout = async ( e: React.MouseEvent<HTMLButtonElement, MouseEvent> ) =>
+    {
+        e.preventDefault();
+        try
+        {
+            const response = await authApiClass.logoutUser()
+            console.log( "Logout response:", response );
+
+            if ( response?.data?.success )
+            {
+                setLoginValue( false );
+                setShowLogin( false );
+                navigate( "/" );
+                localStorage.setItem( 'isLogin', 'false' );
+                toast.success( 'Logged out successfully' );
+            }
+
+        } catch ( error )
+        {
+            console.log( "Logout error:", error );
+            toast.error( ( error as Error ).message );
+        }
+    }
 
     return (
         <div className={ `flex items-center justify-between px-6 py-4 md:px-16 lg:px-24 xl:px-32 text-gray-600 border-b border-borderColor relative transition-all ${ location.pathname === '/' && 'bg-white' }  ` } >
@@ -30,9 +56,9 @@ export default function Navbar ( { setShowLogin }: NavbarProps )
                         {
                             if ( open )
                             {
-                                setOpen(false)
+                                setOpen( false )
                             }
-                        }} className={ ( { isActive } ) =>
+                        } } className={ ( { isActive } ) =>
                             `block py-2 pr-4 pl-3 duration-200 ${ isActive ? "text-primary border-b-2 border-primary" : "text-gray-700 border-none" }  border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent  hover:text-primary-dull lg:p-0`
                         } key={ index } to={ link.path }>
                             { link.name }
@@ -51,8 +77,13 @@ export default function Navbar ( { setShowLogin }: NavbarProps )
                         onClick={ () => navigate( '/owner' ) }
                         className="cursor-pointer">Dashboard</button>
                     <button
-                        onClick={ () =>
+                        onClick={ ( e ) =>
                         {
+                            if ( isLogin )
+                            {
+                                onSubmitForLogout( e )
+                                return
+                            }
                             if ( open )
                             {
                                 setOpen( false )
