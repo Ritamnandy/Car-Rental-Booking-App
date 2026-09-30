@@ -89,6 +89,9 @@ export class AuthService
     }
   }
 
+  async test () {
+    return apiUserMessage( true, 'this is a test message from backend service' );
+  }
 
   async registerUser ( data: CreateAuthDto )
   {

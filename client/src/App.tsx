@@ -16,6 +16,8 @@ import SignUp from "./components/SignUp"
 import VerifyOtp from "./components/VerifyOtp"
 import ForgetPassword from "./components/ForgetPassword"
 import NotFound from "./components/NotFound"
+import { Toaster } from "react-hot-toast"
+import ResetPassword from "./components/ResentPassword"
 
 
 
@@ -41,6 +43,7 @@ function App ()
   ].includes( location.pathname );
   return (
     <>
+      <Toaster />
       { showLogin && <Login setShowLogin={ setShowLogin } setShowSignup={ setShowSignup } /> }
       { showSignup && <SignUp setShowLogin={ setShowLogin } setShowSignup={ setShowSignup } /> }
 
@@ -59,7 +62,8 @@ function App ()
           <Route path="manage-bookings" element={ <ManageBooking /> } />
         </Route>
         <Route path="/forget-password" element={ <ForgetPassword setShowSignup={ setShowSignup } /> } />
-        <Route path="/verify-otp" element={ <VerifyOtp /> } />
+        <Route path="/reset-password" element={ <ResetPassword /> } />
+        <Route path="/verify-otp" element={ <VerifyOtp email="" /> } />
         <Route path="*" element={ <NotFound /> } />
       </Routes>
       {

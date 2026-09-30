@@ -48,6 +48,18 @@ export class AuthController
   {
 
   }
+  @Throttle( {
+    default: {
+      limit: 10, // limit each IP to 5 requests per `window`
+      ttl: 60_000,
+    },
+  } )
+  @Get('test')
+  @HttpCode( HttpStatus.OK )
+  async test () {
+    return await this.authService.test();
+  }
+
 
   @Throttle( {
     default: {
