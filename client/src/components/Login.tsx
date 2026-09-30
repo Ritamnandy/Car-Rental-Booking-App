@@ -18,7 +18,7 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
 
     const [ loading, setLoading ] = useState( false );
     const [ seenPassword, setSeenPassword ] = useState( false );
-    const { setLoginValue, isLogin } = useLoginState()
+    const { setLoginValue } = useLoginState()
     const navigate = useNavigate()
     const {
         register,
@@ -30,54 +30,32 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
 
     const onSubmit = async ( data: loginData ) =>
     {
-        if ( isLogin )
+        setLoading( true );
+
+        console.log( "Form data:", data );
+
+        try
         {
-            try
-            {
-                const response = await authApiClass.logoutUser()
-                console.log( "Logout response:", response );
+            const response = await authApiClass.loginUser( {
+                email: data.email,
+                password: data.password,
+            } );
 
-                if ( response?.data?.success )
-                {
-                    setLoginValue( false );
-                    setShowLogin( false );
-                    navigate( "/" );
-                }
-                return;
-            } catch ( error )
+            console.log( "Register response:", response?.data?.success );
+
+            if ( response?.data?.success )
             {
-                console.log( "Logout error:", error );
-                toast.error( ( error as Error ).message );
+                setLoginValue( true );
+                setShowLogin( false );
+                navigate( "/" );
             }
-        } else
+        } catch ( error )
         {
-            setLoading( true );
-
-            console.log( "Form data:", data );
-
-            try
-            {
-                const response = await authApiClass.loginUser( {
-                    email: data.email,
-                    password: data.password,
-                } );
-
-                console.log( "Register response:", response );
-
-                if ( response?.data?.success )
-                {
-                    setLoginValue( true );
-                    setShowLogin( false );
-                    navigate( "/" );
-                }
-            } catch ( error )
-            {
-                console.log( "Register error:", error );
+                console.log( "Login error:", error );
                 toast.error( ( error as Error ).message );
-            } finally
-            {
-                setLoading( false );
-            }
+        } finally
+        {
+            setLoading( false );
         }
 
     };
