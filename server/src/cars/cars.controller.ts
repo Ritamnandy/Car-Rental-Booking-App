@@ -29,7 +29,7 @@ export class CarsController
   @HttpCode( HttpStatus.CREATED )
   @Roles( UserRole.ADMIN )
   @UseInterceptors(
-    FileInterceptor( 'image' ),
+    FileInterceptor( 'carImage' ),
   )
   async create ( @Body() createCarDto: CreateCarDto, @Req() req: AuthenticatedRequest, @UploadedFile() file: Express.Multer.File, )
   {

@@ -3,14 +3,16 @@ import
     BadRequestException,
     Injectable,
     InternalServerErrorException,
+    Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import ImageKit from '@imagekit/nodejs';
+import sharp from 'sharp';
 import { Multer } from 'multer';
-
 @Injectable()
 export class ImageService
 {
+    private readonly logger = new Logger( ImageService.name );
     private readonly imageKit: ImageKit;
 
     constructor ( private readonly configService: ConfigService )
@@ -55,9 +57,29 @@ export class ImageService
                     'Image size must be less than 5MB',
                 );
             }
+            // Compress + resize image
+            const compressedImage = await sharp( file.buffer )
+                .resize( {
+                    width: 1200,
+                    height: 1200,
+                    fit: 'inside',
+                    withoutEnlargement: true,
+                } )
+                .webp( {
+                    quality: 80,
+                } )
+                .toBuffer();
+
+            this.logger.log(
+                `Original: ${ ( file.size / 1024 ).toFixed( 2 ) } KB`,
+            );
+
+            this.logger.log(
+                `Compressed: ${ ( compressedImage.length / 1024 ).toFixed( 2 ) } KB`,
+            );
 
             const result = await this.imageKit.files.upload( {
-                file: file.buffer.toString( 'base64' ),
+                file: compressedImage.toString( 'base64' ),
                 fileName: `${ Date.now() }-${ file.originalname }`,
                 folder,
                 useUniqueFileName: true,

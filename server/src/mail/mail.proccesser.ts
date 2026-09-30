@@ -96,12 +96,6 @@ export class MailProcessor extends WorkerHost
             html,
             text,
         } );
-        this.logger.log( {
-            messageId: ( await info ).messageId,
-            response: ( await info ).response,
-            accepted: ( await info ).accepted,
-            rejected: ( await info ).rejected,
-        } );
         return info;
     }
 
