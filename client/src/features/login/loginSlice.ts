@@ -3,21 +3,26 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 
-type IsLogin = boolean
+interface LoginState
+{
+    isLogin: boolean;
+}
 
+const initialState: LoginState = {
+    isLogin: localStorage.getItem( 'isLogin' ) === 'true',
+};
 
-
-const initialState: IsLogin = false
-
-const loginSlice = createSlice({
+const loginSlice = createSlice( {
     name: 'login',
     initialState,
     reducers: {
-        setIsLogin: (state, action:PayloadAction<IsLogin>) => {
-            state = action.payload
+        setIsLogin: ( state, action: PayloadAction<boolean> ) =>
+        {
+            state.isLogin = action.payload;
+            localStorage.setItem( 'isLogin', action.payload.toString() );
         }
     }
-})
+} )
 
 export const { setIsLogin } = loginSlice.actions
 export default loginSlice.reducer
