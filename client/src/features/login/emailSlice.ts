@@ -2,19 +2,23 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 
-type EmailType = string
+interface EmailState
+{
+    email: string;
+}
 
-
-const initialState: EmailType = ''
+const initialState: EmailState = {
+    email: '',
+};
 
 
 const emailSlice = createSlice( {
     name: 'email',
     initialState,
     reducers: {
-        setEmail: ( state, action: PayloadAction<EmailType> ) =>
+        setEmail: ( state, action: PayloadAction<EmailState> ) =>
         {
-            state = action.payload
+            state.email = action.payload.email
         }
     }
 } )
