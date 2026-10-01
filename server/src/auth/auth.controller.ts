@@ -199,7 +199,7 @@ export class AuthController
   @Get( 'profile' )
   @HttpCode( HttpStatus.OK )
   @UseGuards( AuthGuard, RoleGuard )
-  @Roles( UserRole.ADMIN, UserRole.USER )
+  @Roles( UserRole.ADMIN )
   async getProfile ( @Req() req: AuthenticatedRequest )
   {
     return await this.authService.getCurrentUser( req.user.id );

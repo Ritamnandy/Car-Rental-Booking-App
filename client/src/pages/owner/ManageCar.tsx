@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import Title from "../../components/owner/Title";
-import { assets, dummyCarData, type Car } from "../../assets/assets";
+import { assets, type Car } from "../../assets/assets";
+import toast from "react-hot-toast";
+import { carApiClass } from "../../api/car/ApiClass";
 
+type Props = {
+    ownerId: string
+}
 
-export default function ManageCar ()
+export default function ManageCar ( { ownerId }: Props )
 {
 
     const [ cars, setCars ] = useState<Car[]>( [] )
@@ -11,9 +16,26 @@ export default function ManageCar ()
     const currency = import.meta.env.VITE_CURRENCY as string
 
 
-    const fetchData = () =>
+    const fetchData = async () =>
     {
-        setCars( dummyCarData )
+
+        try
+        {
+            const response = await carApiClass.getCarByOwnerId( ownerId );
+
+            console.log( "Owner car response:", response?.data?.success );
+
+            if ( response?.data?.success )
+            {
+                console.log( response.data );
+                setCars( response?.data?.data || [] )
+
+            }
+        } catch ( error )
+        {
+            console.log( "Owner car error:", error );
+            toast.error( ( error as Error ).message );
+        }
     }
 
     useEffect( () =>
@@ -21,7 +43,7 @@ export default function ManageCar ()
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchData()
-    }, [] )
+    },  )
 
 
     return (
@@ -45,7 +67,7 @@ export default function ManageCar ()
                     <tbody>
                         {
                             cars.map( ( car ) => (
-                                <tr key={ car._id } className="border-t border-borderColor">
+                                <tr key={ car.id } className="border-t border-borderColor">
                                     <td className="p-3 flex items-center gap-3">
                                         <img src={ car.image } alt={ car.brand } className="w-16 h-16 object-cover rounded-md aspect-square" />
                                         <div className="max-md:hidden">

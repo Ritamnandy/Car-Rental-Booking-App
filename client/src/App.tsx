@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Navbar from "./components/Navbar"
 import { Route, Routes, useLocation } from "react-router-dom"
 import Home from "./pages/Home"
@@ -16,12 +16,20 @@ import SignUp from "./components/SignUp"
 import VerifyOtp from "./components/VerifyOtp"
 import ForgetPassword from "./components/ForgetPassword"
 import NotFound from "./components/NotFound"
-import { Toaster } from "react-hot-toast"
+import toast, { Toaster } from "react-hot-toast"
 import ResetPassword from "./components/ResentPassword"
 import GoogleSuccess from "./pages/GoogleSuccess"
 import GoogleError from "./pages/GoogleError"
+import { authApiClass } from "./api/auth/AuthApiClass"
 
 
+type UserData = {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  createdAt: string;
+}
 
 function App ()
 {
@@ -43,6 +51,30 @@ function App ()
     "/forget-password",
     "/verify-otp"
   ].includes( location.pathname );
+
+  const [ userData, setUserData ] = useState<UserData | null>( null )
+  const handleUserDataUpdate = async () =>
+  {
+    try
+    {
+      const response = await authApiClass.getUserProfile()
+      console.log( response?.data?.user )
+      setUserData( response?.data?.user )
+    } catch ( error )
+    {
+      console.log( "Register error:", error );
+      toast.error( ( error as Error ).message );
+    }
+  }
+
+  useEffect( () =>
+  {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    handleUserDataUpdate()
+  }, [] );
+
+
+
   return (
     <>
       <Toaster />
@@ -57,17 +89,17 @@ function App ()
         <Route path="/car-details/:id" element={ <CarDetails /> } />
         <Route path="/cars" element={ <Cars /> } />
         <Route path="/my-bookings" element={ <MyBooking /> } />
-        <Route path="/owner" element={ <Layout /> }>
+        <Route path="/owner" element={ <Layout userData={ userData } /> }>
           <Route index element={ <Dashboards /> } />
           <Route path="add-car" element={ <AddCar /> } />
-          <Route path="manage-cars" element={ <ManageCar /> } />
+          <Route path="manage-cars" element={ <ManageCar ownerId={userData?.id || ""} /> } />
           <Route path="manage-bookings" element={ <ManageBooking /> } />
         </Route>
         <Route path="/auth/google/success" element={ <GoogleSuccess /> } />
         <Route path="/auth/google/error" element={ <GoogleError /> } />
         <Route path="/forget-password" element={ <ForgetPassword setShowSignup={ setShowSignup } /> } />
         <Route path="/reset-password" element={ <ResetPassword setShowLogin={ setShowLogin } /> } />
-        <Route path="/verify-otp" element={ <VerifyOtp  /> } />
+        <Route path="/verify-otp" element={ <VerifyOtp /> } />
         <Route path="*" element={ <NotFound /> } />
       </Routes>
       {

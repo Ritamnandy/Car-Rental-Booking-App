@@ -163,7 +163,7 @@ export const dummyUserData = {
 }
 
 export type Car = {
-    _id: string;
+    id: string;
     owner: string;
     brand: string;
     model: string;
@@ -182,7 +182,7 @@ export type Car = {
 
 export const dummyCarData: Car[] = [
     {
-        "_id": "67ff5bc069c03d4e45f30b77",
+        "id": "67ff5bc069c03d4e45f30b77",
         "owner": "67fe3467ed8a8fe17d0ba6e2",
         "brand": "BMW",
         "model": "X5",

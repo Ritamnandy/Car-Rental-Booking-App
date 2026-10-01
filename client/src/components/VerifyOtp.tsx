@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { authApiClass } from "../api/auth/AuthApiClass";
-import { useEmailState } from "../hooks/useReduxConfig";
+import { useEmailState, useLoginState } from "../hooks/useReduxConfig";
 
 
 const OTP_LENGTH = 6;
@@ -15,16 +15,16 @@ const formatTime = ( total: number ) =>
     return `${ m }:${ s }`;
 };
 
-export default function VerifyOtp (  )
+export default function VerifyOtp ()
 {
     const navigate = useNavigate();
-
+    const { setLoginValue } = useLoginState()
     const [ otp, setOtp ] = useState<string[]>( Array( OTP_LENGTH ).fill( "" ) );
     const [ loading, setLoading ] = useState( false );
     const [ resending, setResending ] = useState( false );
     const [ secondsLeft, setSecondsLeft ] = useState( OTP_EXPIRY_SECONDS );
     const [ error, setError ] = useState( "" );
-    const {email} =useEmailState()
+    const { email } = useEmailState()
     const inputRefs = useRef<( HTMLInputElement | null )[]>( [] );
 
     // Focus first box on mount
@@ -140,6 +140,7 @@ export default function VerifyOtp (  )
 
             if ( response?.data?.success )
             {
+                setLoginValue( true );
                 toast.success( "Email verified successfully" );
                 navigate( "/" );
             }

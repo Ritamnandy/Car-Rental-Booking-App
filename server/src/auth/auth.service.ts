@@ -304,7 +304,7 @@ export class AuthService
 
   async getCurrentUser ( userId: string )
   {
-    const cachedUser = await this.redisService.get( `user-profile:${ userId }` )
+    const cachedUser = await this.redisService.get( `user:profile:${ userId }` )
     if ( cachedUser )
     {
       return apiUserMessage( true, 'User found', JSON.parse( cachedUser ) as object )
@@ -315,7 +315,7 @@ export class AuthService
       throw new BadRequestException( 'User not found with this id' )
     }
 
-    await this.redisService.set( `user-profile:${ userId }`, JSON.stringify( {
+    await this.redisService.set( `user:profile:${ userId }`, JSON.stringify( {
       id: result.id,
       email: result.email,
       name: result.name,
@@ -353,6 +353,7 @@ export class AuthService
       throw new BadRequestException( 'Failed to set user profile image, please try again later' )
 
     }
+    await this.redisService.delete( `user:profile:${ userId }` )
     return apiUserMessage( true, 'User profile image set successfully', { imageUrl: response.profileImage } )
   }
 

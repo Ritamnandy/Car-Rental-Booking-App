@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom"
 import { assets, ownerMenuLinks } from "../../assets/assets"
-import {   useState } from "react"
+import { useState } from "react"
+import { authApiClass } from "../../api/auth/AuthApiClass";
 
 
 type UserData = {
@@ -15,31 +16,59 @@ type SideBarProps = {
     userData: UserData | null;
 }
 
-export default function SideBar ({ userData }: SideBarProps)
+export default function SideBar ( { userData }: SideBarProps )
 {
 
     const location = useLocation()
-
+    const [ loading, setLoading ] = useState( false );
     const [ image, setImage ] = useState<File | null>( null )
 
     const updateImage = async () =>
     {
         if ( !image ) return
+        setLoading( true )
+        console.log( 'update image call' );
+
+        try
+        {
+            const formData = new FormData();
+
+            formData.append( 'profileImage', image );
+
+            const response = await authApiClass.setProfileImage( formData )
+
+            console.log( response );
+        } catch ( error )
+        {
+            console.error( error );
+        } finally
+        {
+            setLoading( false )
+            setImage(image  )
+        }
+
         // user.image = URL.createObjectURL( image )
-        setImage( null )
     }
 
 
     return (
         <div className="relative min-h-screen md:flex flex-col items-center pt-8 max-w-13 md:max-w-60 w-full border-r border-borderColor text-sm">
 
+
+
             <div className="group relative">
                 <label htmlFor="image">
-
+                    {/* Loading */ }
+                    { loading && (
+                        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-white/60 z-10">
+                            <span className="loading loading-spinner text-primary loading-lg" />
+                        </div>
+                    ) }
                     <img src={ image ? URL.createObjectURL( image ) : userData?.image || "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJbhN88I9CuUGPLDK9IAkwPQl5jV4JPQpyn3nvGDFqo8JFF8U3TEikCOUq&s=10" } alt="" className="h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto" />
                     <input type="file" name="image" id="image" accept="image/*" onChange={ ( e ) => setImage( e.target.files?.[ 0 ] || null ) } hidden />
 
                     <div className="absolute hidden top-0 right-0 left-0 bottom-0 bg-black/10 rounded-full group-hover:flex items-center justify-center cursor-pointer">
+
 
                         <img src={ assets.edit_icon } alt="" />
 
@@ -49,8 +78,8 @@ export default function SideBar ({ userData }: SideBarProps)
             </div>
             {
                 image && (
-                    <button onClick={ updateImage } className="absolute transform -translate-x-1/20 mt-1 px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 right-0 cursor-pointer">
-                        Save <img src={ assets.check_icon } alt="" width={ 13 } />
+                    <button onClick={ updateImage } className="absolute transform -translate-x-1/20 mt-1 px-4 py-2 bg-primary text-white rounded-md flex items-center gap-2 right-0 cursor-pointer text-sm">
+                        save <img src={ assets.check_icon } alt="" width={ 13 } />
                     </button>
                 )
             }

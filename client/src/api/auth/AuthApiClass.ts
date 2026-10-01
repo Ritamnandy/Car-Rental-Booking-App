@@ -282,6 +282,34 @@ export class AuthApiClass
         }
     }
 
+
+    async setProfileImage (data:FormData)
+    {
+        try
+        {
+            const response = await api.post( '/auth/profile-image', data );
+            return response;
+        } catch ( error )
+        {
+            if ( axios.isAxiosError( error ) )
+            {
+                console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
+                console.log( "Backend error:", error.response?.data.message );
+
+            } else
+            {
+                toast.error( "Failed to get user profile, please try again later" );
+                throw error;
+
+            }
+
+
+        }
+    }
+
+
+
 }
 
 export const authApiClass = new AuthApiClass();

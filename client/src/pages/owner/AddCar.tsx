@@ -1,8 +1,61 @@
 import { useState } from "react"
 import Title from "../../components/owner/Title"
 import { assets } from "../../assets/assets"
+import toast from "react-hot-toast"
+import { carApiClass } from "../../api/car/ApiClass"
 
-
+const LocationData = [
+    "Albuquerque",
+    "Atlanta",
+    "Austin",
+    "Baltimore",
+    "Boston",
+    "Charlotte",
+    "Chicago",
+    "Cleveland",
+    "Colorado_Springs",
+    "Columbus",
+    "Dallas",
+    "Denver",
+    "Detroit",
+    "El_Paso",
+    "Fort_Worth",
+    "Fresno",
+    "Houston",
+    "Indianapolis",
+    "Jacksonville",
+    "Kansas_City",
+    "Las_Vegas",
+    "Long_Beach",
+    "Los_Angeles",
+    "Memphis",
+    "Miami",
+    "Milwaukee",
+    "Minneapolis",
+    "Nashville",
+    "New_Orleans",
+    "New_York",
+    "Oakland",
+    "Oklahoma_City",
+    "Omaha",
+    "Orlando",
+    "Philadelphia",
+    "Phoenix",
+    "Pittsburgh",
+    "Portland",
+    "Sacramento",
+    "San_Antonio",
+    "San_Diego",
+    "San_Francisco",
+    "San_Jose",
+    "Seattle",
+    "Tampa",
+    "Tucson",
+    "Tulsa",
+    "Virginia_Beach",
+    "Washington_DC",
+    "Wichita",
+];
 
 export default function AddCar ()
 {
@@ -12,12 +65,12 @@ export default function AddCar ()
     const [ car, setCar ] = useState( {
         brand: '',
         model: '',
-        year: 0,
-        pricePerDay: 0,
+        year: '',
+        pricePerDay: '',
         category: '',
         transmission: '',
         fuel_type: '',
-        seating_capacity: 0,
+        seating_capacity: '',
         location: '',
         description: '',
     } )
@@ -33,11 +86,74 @@ export default function AddCar ()
     const onSubmitHandler = async ( e: React.SubmitEvent ) =>
     {
         e.preventDefault()
+        if ( !image )
+        {
+            toast.error( 'Please upload a car image' )
+            return
+        }
+        const formData = new FormData();
+        formData.append( 'carImage', image );
+        console.log( 'car data:- ', {
+            brand: car.brand,
+            model: car.model,
+            carImage: formData,
+            category: car.category,
+            description: car.description,
+            fuelType: car.fuel_type,
+            year: car.year,
+            seating_capacity: car.seating_capacity,
+            transmission: car.transmission.replace( '-', '' ),
+            pricePerDay: car.pricePerDay,
+            location: car.location,
+        } );
+
         setLoading( true )
-        setTimeout( () =>
+        try
+        {
+            formData.append( "brand", car.brand );
+            formData.append( "model", car.model );
+            formData.append( "year", car.year );
+            formData.append( "pricePerDay", car.pricePerDay );
+            formData.append( "category", car.category );
+            formData.append( "transmission", car.transmission );
+            formData.append( "fuelType", car.fuel_type );
+            formData.append(
+                "seating_capacity",
+                String( car.seating_capacity ),
+            );
+            formData.append( "location", car.location );
+            formData.append( "description", car.description );
+
+            const response = await carApiClass.addCar( formData )
+
+            console.log( "add car  response:", response?.data?.success );
+
+            if ( response?.data?.success )
+            {
+                toast.success( 'Car added successfully' )
+                setLoading( false )
+                setCar( {
+                    brand: '',
+                    model: '',
+                    year: '',
+                    pricePerDay: '',
+                    category: '',
+                    transmission: '',
+                    fuel_type: '',
+                    seating_capacity: '',
+                    location: '',
+                    description: '',
+                } )
+                setImage( null )
+            }
+        } catch ( error )
+        {
+            console.error( error )
+            toast.error( 'Failed to add car' )
+        } finally
         {
             setLoading( false )
-        }, 4000 )
+        }
 
     }
 
@@ -87,7 +203,7 @@ export default function AddCar ()
                         <input type="number"
                             value={ car.year }
                             placeholder={ `${ new Date().getFullYear() }` } className="border border-borderColor  px-3 py-2 mt-1 rounded-md outline-none" required
-                            onChange={ e => setCar( { ...car, year: Number( e.target.value ) } ) }
+                            onChange={ e => setCar( { ...car, year: e.target.value } ) }
                         />
                     </div>
 
@@ -96,7 +212,7 @@ export default function AddCar ()
                         <input type="number"
                             value={ car.pricePerDay }
                             placeholder='100' className="border border-borderColor  px-3 py-2 mt-1 rounded-md outline-none" required
-                            onChange={ e => setCar( { ...car, pricePerDay: Number( e.target.value ) } ) }
+                            onChange={ e => setCar( { ...car, pricePerDay: e.target.value } ) }
                         />
                     </div>
 
@@ -132,7 +248,7 @@ export default function AddCar ()
 
                             <option value="Manual">Manual</option>
                             <option value="Automatic">Automatic</option>
-                            <option value="Semi-Automatic">Semi-Automatic</option>
+                            <option value="SemiAutomatic">Semi-Automatic</option>
                             <option value="AMT">AMT</option>
                             <option value="CVT">CVT</option>
                             <option value="DCT">DCT</option>
@@ -160,7 +276,7 @@ export default function AddCar ()
                         <input type="number"
                             value={ car.seating_capacity }
                             placeholder='5' className="border border-borderColor  px-3 py-2 mt-1 rounded-md outline-none" required
-                            onChange={ e => setCar( { ...car, seating_capacity: Number( e.target.value ) } ) }
+                            onChange={ e => setCar( { ...car, seating_capacity: e.target.value } ) }
                         />
                     </div>
 
@@ -171,56 +287,12 @@ export default function AddCar ()
                     <select onChange={ e => setCar( { ...car, location: e.target.value } ) } value={ car.location } className="select">
                         <option value="">Select Location</option>
 
-                        <option value="Albuquerque">Albuquerque</option>
-                        <option value="Atlanta">Atlanta</option>
-                        <option value="Austin">Austin</option>
-                        <option value="Baltimore">Baltimore</option>
-                        <option value="Boston">Boston</option>
-                        <option value="Charlotte">Charlotte</option>
-                        <option value="Chicago">Chicago</option>
-                        <option value="Cleveland">Cleveland</option>
-                        <option value="Colorado Springs">Colorado Springs</option>
-                        <option value="Columbus">Columbus</option>
-                        <option value="Dallas">Dallas</option>
-                        <option value="Denver">Denver</option>
-                        <option value="Detroit">Detroit</option>
-                        <option value="El Paso">El Paso</option>
-                        <option value="Fort Worth">Fort Worth</option>
-                        <option value="Fresno">Fresno</option>
-                        <option value="Houston">Houston</option>
-                        <option value="Indianapolis">Indianapolis</option>
-                        <option value="Jacksonville">Jacksonville</option>
-                        <option value="Kansas City">Kansas City</option>
-                        <option value="Las Vegas">Las Vegas</option>
-                        <option value="Long Beach">Long Beach</option>
-                        <option value="Los Angeles">Los Angeles</option>
-                        <option value="Memphis">Memphis</option>
-                        <option value="Miami">Miami</option>
-                        <option value="Milwaukee">Milwaukee</option>
-                        <option value="Minneapolis">Minneapolis</option>
-                        <option value="Nashville">Nashville</option>
-                        <option value="New Orleans">New Orleans</option>
-                        <option value="New York">New York</option>
-                        <option value="Oakland">Oakland</option>
-                        <option value="Oklahoma City">Oklahoma City</option>
-                        <option value="Omaha">Omaha</option>
-                        <option value="Orlando">Orlando</option>
-                        <option value="Philadelphia">Philadelphia</option>
-                        <option value="Phoenix">Phoenix</option>
-                        <option value="Pittsburgh">Pittsburgh</option>
-                        <option value="Portland">Portland</option>
-                        <option value="Sacramento">Sacramento</option>
-                        <option value="San Antonio">San Antonio</option>
-                        <option value="San Diego">San Diego</option>
-                        <option value="San Francisco">San Francisco</option>
-                        <option value="San Jose">San Jose</option>
-                        <option value="Seattle">Seattle</option>
-                        <option value="Tampa">Tampa</option>
-                        <option value="Tucson">Tucson</option>
-                        <option value="Tulsa">Tulsa</option>
-                        <option value="Virginia Beach">Virginia Beach</option>
-                        <option value="Washington D.C.">Washington D.C.</option>
-                        <option value="Wichita">Wichita</option>
+                        {
+                            LocationData.map( ( data, index ) =>
+                            {
+                                return <option key={ index } value={ data }>{ data.replace( '_', ' ' ) }</option>
+                            } )
+                        }
                     </select>
                 </div>
                 {/* description */ }
