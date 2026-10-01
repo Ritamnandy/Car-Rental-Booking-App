@@ -16,6 +16,7 @@ import { RoleGuard } from './roleguard/role.guard.js';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import type { GoogleOauthBody } from './types/googleoauthbody.type.js';
+import { ConfigService } from '@nestjs/config';
 
 @Controller( 'auth' )
 export class AuthController
@@ -45,7 +46,9 @@ export class AuthController
     } );
   }
 
-  constructor ( private readonly authService: AuthService )
+  constructor (
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService )
   {
 
   }
@@ -196,7 +199,7 @@ export class AuthController
   @Get( 'profile' )
   @HttpCode( HttpStatus.OK )
   @UseGuards( AuthGuard, RoleGuard )
-  @Roles( UserRole.ADMIN )
+  @Roles( UserRole.ADMIN, UserRole.USER )
   async getProfile ( @Req() req: AuthenticatedRequest )
   {
     return await this.authService.getCurrentUser( req.user.id );
@@ -246,7 +249,15 @@ export class AuthController
   {
     const response = await this.authService.googleLogin( data );
     this.setAuthCookies( res, response.accessToken ?? '', response.refreshToken ?? '' );
-    return response;
+    const homePage = this.configService.getOrThrow( 'SUCCESS_URL' );
+    const errorPage = this.configService.getOrThrow( 'ERROR_URL' );
+    if ( response.success )
+    {
+
+      return res.redirect( homePage );
+    }
+
+    return res.redirect( errorPage );
   }
 
 

@@ -16,6 +16,8 @@ type Props = {
 export default function Login ( { setShowLogin, setShowSignup }: Props )
 {
 
+    const googleLoginUrl = import.meta.env.VITE_GOOGLE_LOGIN_URL;
+    
     const [ loading, setLoading ] = useState( false );
     const [ seenPassword, setSeenPassword ] = useState( false );
     const { setLoginValue } = useLoginState()
@@ -51,8 +53,8 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
             }
         } catch ( error )
         {
-                console.log( "Login error:", error );
-                toast.error( ( error as Error ).message );
+            console.log( "Login error:", error );
+            toast.error( ( error as Error ).message );
         } finally
         {
             setLoading( false );
@@ -60,6 +62,22 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
 
     };
 
+    const handlegoogleLogin = async () =>
+    {
+        
+        try
+        {
+            setLoading( true );
+            window.location.href = googleLoginUrl;
+        } catch ( error )
+        {
+            console.log( "Google login error:", error );
+            toast.error( ( error as Error ).message );
+        } finally
+        {
+            setLoading( false );
+        }
+    };
 
     return (
         <div
@@ -184,7 +202,10 @@ export default function Login ( { setShowLogin, setShowSignup }: Props )
                     </span>
                 </p>
                 <div className=" text-center">or</div>
-                <button type="button" className="w-full flex items-center text-sm gap-2 justify-center my-3 bg-white border border-gray-500/30 py-2.5 rounded text-gray-800 cursor-pointer">
+                <button type="button"
+                    disabled={ loading }
+                    onClick={ handlegoogleLogin }
+                    className="w-full flex items-center text-sm gap-2 justify-center my-3 bg-white border border-gray-500/30 py-2.5 rounded text-gray-800 cursor-pointer">
                     <img className="h-4 w-4" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleFavicon.png" alt="googleFavicon" />
                     Log in with Google
                 </button>

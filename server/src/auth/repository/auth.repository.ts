@@ -243,7 +243,20 @@ export class AuthRepository
         }
     }
 
-
+    async findUserByGoogleId ( googleId: string )
+    {
+        try
+        {
+            return await this.prisma.user.findUnique( {
+                where: {
+                    googleId
+                }
+            } )
+        } catch ( error )
+        {
+            this.handleError( error, 'findUserByGoogleId' );
+        }
+    }
 
 
 

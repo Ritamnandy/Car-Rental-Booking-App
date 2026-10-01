@@ -27,7 +27,7 @@ export class AuthApiClass
             {
                 console.log( "Status:", error.response?.status );
                 console.log( "Backend error:", error.response?.data.message );
-                
+
             } else
             {
                 toast.error( "Failed to register user, please try again later" );
@@ -35,7 +35,7 @@ export class AuthApiClass
 
             }
 
-            
+
         }
     }
 
@@ -72,7 +72,7 @@ export class AuthApiClass
         {
             const data = {
                 email: userData.email,
-                otp:userData.otp
+                otp: userData.otp
             };
             const response = await api.post( '/auth/verify', data );
             return response;
@@ -257,6 +257,30 @@ export class AuthApiClass
     }
 
 
+    async loginwithGoogle ()
+    {
+        try
+        {
+            const response = await api.get( '/auth/google' );
+            return response;
+        } catch ( error )
+        {
+            if ( axios.isAxiosError( error ) )
+            {
+                console.log( "Status:", error.response?.status );
+                toast.error( error.response?.data.message );
+                console.log( "Backend error:", error.response?.data.message );
+
+            } else
+            {
+                toast.error( "Failed to get user profile, please try again later" );
+                throw error;
+
+            }
+
+
+        }
+    }
 
 }
 

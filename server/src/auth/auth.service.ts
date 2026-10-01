@@ -358,6 +358,27 @@ export class AuthService
 
   async googleLogin ( data: GoogleOauthBody )
   {
+
+    const existingUser = await this.authRepository.findUserByGoogleId( data.googleId )
+    if ( existingUser )
+    {
+      const { jwt: accessTokenPayload, refresh: refreshTokenPayload } = this.createPayLoad( {
+        email: existingUser.email,
+        id: existingUser.id,
+        role: existingUser.role,
+      } )
+
+      const { accessToken, refreshToken } = await this.genarateTokenPair( accessTokenPayload, refreshTokenPayload )
+      return apiUserMessage( true, 'User logged in successfully', {
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        image: existingUser.profileImage,
+        createAt: existingUser.createdAt
+
+      }, accessToken, refreshToken )
+    }
+
     const result = await this.authRepository.googleLogin( data )
     if ( !result )
     {

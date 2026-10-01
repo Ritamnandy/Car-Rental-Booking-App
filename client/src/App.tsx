@@ -18,6 +18,8 @@ import ForgetPassword from "./components/ForgetPassword"
 import NotFound from "./components/NotFound"
 import { Toaster } from "react-hot-toast"
 import ResetPassword from "./components/ResentPassword"
+import GoogleSuccess from "./pages/GoogleSuccess"
+import GoogleError from "./pages/GoogleError"
 
 
 
@@ -61,6 +63,8 @@ function App ()
           <Route path="manage-cars" element={ <ManageCar /> } />
           <Route path="manage-bookings" element={ <ManageBooking /> } />
         </Route>
+        <Route path="/auth/google/success" element={ <GoogleSuccess /> } />
+        <Route path="/auth/google/error" element={ <GoogleError /> } />
         <Route path="/forget-password" element={ <ForgetPassword setShowSignup={ setShowSignup } /> } />
         <Route path="/reset-password" element={ <ResetPassword setShowLogin={ setShowLogin } /> } />
         <Route path="/verify-otp" element={ <VerifyOtp  /> } />
