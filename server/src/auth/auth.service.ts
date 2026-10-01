@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto.js';
 import { ResendOtpDto } from './dto/resend.dto.js';
 import { SetPasswordDto } from './dto/setPassword.dto.js';
 import { ImageService } from '../images/images.service.js';
+import type { GoogleOauthBody } from './types/googleoauthbody.type.js';
 
 @Injectable()
 export class AuthService
@@ -192,7 +193,7 @@ export class AuthService
       throw new BadRequestException( 'User with this email does not exist' )
     }
 
-    const isPasswordValid = await comparePassword( data.password, result.password )
+    const isPasswordValid = await comparePassword( data.password, result.password as string )
     if ( !isPasswordValid )
     {
       throw new BadRequestException( 'Invalid credentials,Please check your password' )
@@ -355,6 +356,30 @@ export class AuthService
     return apiUserMessage( true, 'User profile image set successfully', { imageUrl: response.profileImage } )
   }
 
+  async googleLogin ( data: GoogleOauthBody )
+  {
+    const result = await this.authRepository.googleLogin( data )
+    if ( !result )
+    {
+      throw new BadRequestException( 'Failed to login with google, please try again later' )
+    }
+    const { jwt: accessTokenPayload, refresh: refreshTokenPayload } = this.createPayLoad( {
+      email: result.email,
+      id: result.id,
+      role: result.role,
+    } )
+
+    const { accessToken, refreshToken } = await this.genarateTokenPair( accessTokenPayload, refreshTokenPayload )
+    this.logger.log( `User logged in with google ${ result.email }` )
+    return apiUserMessage( true, 'User logged in successfully', {
+      id: result.id,
+      name: result.name,
+      email: result.email,
+      image: result.profileImage,
+      createAt: result.createdAt
+
+    }, accessToken, refreshToken )
+  }
 
 
 }

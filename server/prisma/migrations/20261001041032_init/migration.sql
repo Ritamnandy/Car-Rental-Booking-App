@@ -25,9 +25,10 @@ CREATE TYPE "PaymentMethod" AS ENUM ('CREDIT_CARD', 'DEBIT_CARD', 'PAYPAL', 'CAS
 -- CreateTable
 CREATE TABLE "users" (
     "user_id" TEXT NOT NULL,
+    "google_id" TEXT,
     "user_name" VARCHAR(50) NOT NULL,
     "user_email" VARCHAR(255) NOT NULL,
-    "user_password" TEXT NOT NULL,
+    "user_password" TEXT,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
     "profile_image" TEXT,
@@ -76,6 +77,9 @@ CREATE TABLE "bookings" (
 
     CONSTRAINT "bookings_pkey" PRIMARY KEY ("booking_id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_google_id_key" ON "users"("google_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_user_email_key" ON "users"("user_email");

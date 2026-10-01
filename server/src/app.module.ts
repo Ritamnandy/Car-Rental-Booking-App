@@ -26,10 +26,13 @@ import imagekitConfig from './config/imagekit.config.js';
     ThrottlerModule.forRoot( {
       throttlers: [
         {
+          name:"default",
           ttl: 60000,
           limit: 15,
         },
+        
       ],
+      errorMessage: 'Too many requests. Please try again later.',
     } ),
 
     PrismaModule,

@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/client';
 import { CreateAuthDto } from '../dto/create-auth.dto.js';
 import { UserRole, UserStatus } from '../../generated/prisma/enums.js';
+import type { GoogleOauthBody } from '../types/googleoauthbody.type.js';
 
 
 
@@ -77,7 +78,7 @@ export class AuthRepository
                     isVerified: true,
                     status: UserStatus.ACTIVE,
                 },
-                
+
             } )
 
         }
@@ -218,5 +219,32 @@ export class AuthRepository
             this.handleError( error, 'setUserProfileImage' );
         }
     }
+
+    async googleLogin ( data: GoogleOauthBody )
+    {
+        try
+        {
+            return await this.prisma.user.create( {
+                data: {
+                    googleId: data.googleId,
+                    email: data.email,
+                    name: data.name,
+                    profileImage: data.profileImage,
+                    isVerified: data.isEmailVerified,
+                    role: UserRole.USER,
+                    status: UserStatus.ACTIVE
+                }
+            } )
+
+        }
+        catch ( error )
+        {
+            this.handleError( error, 'googleLogin' );
+        }
+    }
+
+
+
+
 
 }

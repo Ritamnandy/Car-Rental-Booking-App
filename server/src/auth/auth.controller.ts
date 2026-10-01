@@ -14,7 +14,8 @@ import { Roles } from './role/role.decorator.js';
 import { UserRole } from '../generated/prisma/browser.js';
 import { RoleGuard } from './roleguard/role.guard.js';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
+import type { GoogleOauthBody } from './types/googleoauthbody.type.js';
 
 @Controller( 'auth' )
 export class AuthController
@@ -54,9 +55,10 @@ export class AuthController
       ttl: 60_000,
     },
   } )
-  @Get('test')
+  @Get( 'test' )
   @HttpCode( HttpStatus.OK )
-  async test () {
+  async test ()
+  {
     return await this.authService.test();
   }
 
@@ -101,8 +103,8 @@ export class AuthController
   async verifyUser ( @Body() data: VerifyEmailDto, @Res( { passthrough: true } ) res: Response )
   {
     const result = await this.authService.verifyEmail( data );
-    console.log(result);
-    
+    console.log( result );
+
     this.setAuthCookies( res, result.accessToken ?? '', result.refreshToken ?? '' );
     return result;
   }
@@ -193,7 +195,7 @@ export class AuthController
   } )
   @Get( 'profile' )
   @HttpCode( HttpStatus.OK )
-  @UseGuards(AuthGuard, RoleGuard )
+  @UseGuards( AuthGuard, RoleGuard )
   @Roles( UserRole.ADMIN )
   async getProfile ( @Req() req: AuthenticatedRequest )
   {
@@ -216,10 +218,42 @@ export class AuthController
   @Roles( UserRole.ADMIN )
   async setProfileImage ( @Req() req: AuthenticatedRequest, @UploadedFile() file: Express.Multer.File )
   {
-    console.log(file);
-    
+    console.log( file );
+
     return await this.authService.setUserImage( file, req.user.id );
   }
+
+
+  @Throttle( {
+    default: {
+      limit: 5, // limit each IP to 5 requests per `window`
+      ttl: 60_000,
+    },
+  } )
+  @Get( 'google' )
+  @UseGuards( PassportAuthGuard( 'google' ) )
+  googleLogin ()
+  {
+    // Passport redirects to Google
+  }
+
+
+
+
+  @Get( 'google/callback' )
+  @UseGuards( PassportAuthGuard( 'google' ) )
+  async googleCallback ( @Body() data: GoogleOauthBody, @Res( { passthrough: true } ) res: Response )
+  {
+    const response = await this.authService.googleLogin( data );
+    this.setAuthCookies( res, response.accessToken ?? '', response.refreshToken ?? '' );
+    return response;
+  }
+
+
+
+
+
+
 
 
 }
